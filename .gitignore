@@ -5,9 +5,6 @@ __pycache__/
 # OS
 .DS_Store
 
-# Streamlit
-.streamlit/
-
 # Virtual Environments
 venv/
 env/
@@ -20,3 +17,8 @@ env/
 # Temporary analysis files
 analisis_fuente.py
 inspect_excel.py
+audit_report.csv
+
+# Excel source files (keep only CSV)
+catalogos/fuente_original.xlsx
+final_parser.py

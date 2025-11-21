@@ -11,7 +11,7 @@ from pathlib import Path
 
 # Directorio base del proyecto
 BASE_DIR = Path(__file__).parent
-DATA_DIR = BASE_DIR.parent / "bases_limpias"
+DATA_DIR = BASE_DIR / "data"
 CACHE_DIR = BASE_DIR / "data" / "cache"
 CATALOGOS_DIR = BASE_DIR / "catalogos"
 
