@@ -10,7 +10,7 @@ def render_sidebar(df):
     Renderiza la barra lateral y sus filtros.
 
     Args:
-        df (pd.DataFrame): El DataFrame principal con todos los datos.
+        df (pd.DataFrame or None): El DataFrame principal. Si es None, los filtros se deshabilitan.
 
     Returns:
         dict: Un diccionario con todos los valores de los filtros seleccionados.
@@ -44,14 +44,20 @@ def render_sidebar(df):
     # --- 2. Filtros Globales ---
     st.sidebar.subheader("🔍 Filtros Generales")
 
-    # Obtener listas únicas para filtros
-    unidades_especificas_disponibles = get_unidades_especificas(df)
-    años_disponibles = sorted(df['Año'].unique().tolist())
-    sexos_disponibles = sorted(df['Sexo'].unique().tolist())
-    edades_disponibles = sorted(df['Edad'].unique().tolist())
+    # Si no hay datos, deshabilita los filtros
+    if df is None:
+        unidades_especificas_disponibles, años_disponibles, sexos_disponibles, edades_disponibles = [], [], [], []
+        total_general = 0
+        is_disabled = True
+        st.sidebar.warning("Cargue un archivo CSV para habilitar los filtros.")
+    else:
+        unidades_especificas_disponibles = get_unidades_especificas(df)
+        años_disponibles = sorted(df['Año'].unique().tolist())
+        sexos_disponibles = sorted(df['Sexo'].unique().tolist())
+        edades_disponibles = sorted(df['Edad'].unique().tolist())
+        total_general = get_total_general(df)
+        is_disabled = False
 
-    # Total General (siempre visible)
-    total_general = get_total_general(df)
     st.sidebar.info(f"""
     **Total General Escuintla**
     {format_large_number(total_general)} casos
@@ -62,19 +68,22 @@ def render_sidebar(df):
         "Filtrar por Unidad Específica:",
         options=unidades_especificas_disponibles,
         default=[],
-        help="Selecciona unidades específicas para ver desglose. Vacío = muestra General completo"
+        help="Selecciona unidades específicas para ver desglose. Vacío = muestra General completo",
+        disabled=is_disabled
     )
 
     filtro_año = st.sidebar.multiselect(
         "Año:",
         options=años_disponibles,
         default=años_disponibles,
+        disabled=is_disabled
     )
 
     filtro_sexo = st.sidebar.multiselect(
         "Sexo:",
         options=sexos_disponibles,
         default=sexos_disponibles,
+        disabled=is_disabled
     )
 
     with st.sidebar.expander("Filtro Avanzado: Edad"):
@@ -82,6 +91,7 @@ def render_sidebar(df):
             "Rangos de edad:",
             options=edades_disponibles,
             default=edades_disponibles,
+            disabled=is_disabled
         )
 
     st.sidebar.markdown("---")

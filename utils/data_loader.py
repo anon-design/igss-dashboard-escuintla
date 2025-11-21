@@ -13,6 +13,20 @@ sys.path.append(str(Path(__file__).parent.parent))
 from config import DATA_FILE, CATALOGOS_DIR
 
 
+def load_all_data(uploaded_file=None):
+    """
+    Carga todos los datos necesarios para la aplicación, aceptando un archivo opcional.
+    """
+    data = {
+        'data': load_data(uploaded_file),
+        'capitulos': load_cie10_capitulos(),
+        'eno': load_cie10_eno(),
+        'cronicas': load_cie10_cronicas(),
+        'diagnosticos': load_diagnosticos_nombres()
+    }
+    return data
+
+
 def load_data(uploaded_file=None):
     """
     Carga, limpia y reconstruye los datos para garantizar la consistencia jerárquica.
