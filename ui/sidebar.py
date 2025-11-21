@@ -104,7 +104,17 @@ def render_sidebar(df):
         )
         st.markdown(
             """
-            <small>El archivo debe contener las columnas: `CIE10`, `Unidad`, `Año`, `Sexo`, `Edad`, `Casos`.</small>
+            <small>
+            <b>Formato del archivo CSV requerido:</b>
+            <ul>
+                <li><b>CIE10</b>: Código (ej. "I10")</li>
+                <li><b>Unidad</b>: Nombre de la unidad (ej. "Hospital Escuintla")</li>
+                <li><b>Año</b>: Año del registro (ej. "2023")</li>
+                <li><b>Sexo</b>: Sexo del paciente (ej. "FEMENINO")</li>
+                <li><b>Edad</b>: Rango de edad (ej. "31-35")</li>
+                <li><b>Casos</b>: Número de casos (ej. "150")</li>
+            </ul>
+            </small>
             """, 
             unsafe_allow_html=True
         )

@@ -76,63 +76,85 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
 
     st.markdown("---")
 
-    # Top 25 diagnósticos
-    st.subheader("📊 Top 25 Diagnósticos Más Frecuentes")
+    # Top N diagnósticos
+    st.subheader("📊 Top N Diagnósticos Más Frecuentes")
 
-    top_25 = get_top_n(df_adultos, n=25, group_by='CIE10')
+    # Widget para seleccionar N
+    top_n_value = st.number_input(
+        "Selecciona el número de diagnósticos a mostrar (N):",
+        min_value=5,
+        max_value=100,
+        value=25,
+        step=5
+    )
 
-    if not top_25.empty:
-        # Calcular porcentajes
-        top_25['Porcentaje'] = (top_25['Casos'] / total_casos * 100).round(2)
+    top_n = get_top_n(df_adultos, n=top_n_value, group_by='CIE10')
 
+    if not top_n.empty:
         # Unir con el catálogo completo de nombres
-        top_25 = pd.merge(top_25, df_diagnosticos, left_on='CIE10', right_on='cie10', how='left')
-        top_25['Diagnóstico'] = top_25['nombre'].fillna('Nombre no disponible')
-        top_25.drop(columns=['cie10', 'nombre'], inplace=True)
+        top_n = pd.merge(top_n, df_diagnosticos, left_on='CIE10', right_on='cie10', how='left')
+        top_n['Diagnóstico'] = top_n['nombre'].fillna('Nombre no disponible')
+        top_n.drop(columns=['cie10', 'nombre'], inplace=True)
+        
+        # Filtro de exclusión
+        diagnosticos_disponibles = top_n['Diagnóstico'].tolist()
+        diagnosticos_seleccionados = st.multiselect(
+            "Selecciona los diagnósticos a incluir en la tabla y gráfico:",
+            options=diagnosticos_disponibles,
+            default=diagnosticos_disponibles
+        )
+        
+        # Filtrar el dataframe basado en la selección
+        top_n_filtrado = top_n[top_n['Diagnóstico'].isin(diagnosticos_seleccionados)]
+
+        # Calcular porcentajes
+        top_n_filtrado['Porcentaje'] = (top_n_filtrado['Casos'] / total_casos * 100).round(2)
 
         # Agregar información adicional (ENO, Crónica)
-        top_25['Es_ENO'] = top_25['CIE10'].apply(
+        top_n_filtrado['Es_ENO'] = top_n_filtrado['CIE10'].apply(
             lambda x: '⚠️' if x in df_eno['cie10'].values else ''
         )
-        top_25['Es_Cronica'] = top_25['CIE10'].apply(
+        top_n_filtrado['Es_Cronica'] = top_n_filtrado['CIE10'].apply(
             lambda x: '💊' if x in df_cronicas['cie10'].values else ''
         )
 
         # Crear tabla formateada
-        top_25_display = top_25.copy()
-        top_25_display['Casos'] = top_25_display['Casos'].apply(format_large_number)
+        top_display = top_n_filtrado.copy()
+        top_display['Casos'] = top_display['Casos'].apply(format_large_number)
         
         # Reordenar columnas para mostrar
         column_order = ['#', 'Diagnóstico', 'Código CIE-10', 'Casos', '%', 'ENO', 'Crónica']
-        top_25_display_renamed = top_25_display.rename(columns={
+        top_display_renamed = top_display.rename(columns={
             'Rank': '#',
             'CIE10': 'Código CIE-10',
             'Porcentaje': '%',
             'Es_ENO': 'ENO',
             'Es_Cronica': 'Crónica'
         })
-        st.dataframe(top_25_display_renamed[column_order], use_container_width=True, hide_index=True)
+        st.dataframe(top_display_renamed[column_order], use_container_width=True, hide_index=True)
 
         st.info("💡 **Leyenda:** ⚠️ = Enfermedad de Notificación Obligatoria | 💊 = Enfermedad Crónica")
 
         # Gráfico de barras horizontales
-        st.subheader("📈 Visualización Top 25")
+        st.subheader(f"📈 Visualización Top {len(top_n_filtrado)}")
 
-        # Usar nombres de diagnóstico en el gráfico para mayor claridad
-        fig = create_bar_chart(
-            top_25.head(25),
-            x='Casos',
-            y='Diagnóstico', # Cambiado de 'CIE10' a 'Diagnóstico'
-            title='Top 25 Diagnósticos en Adultos',
-            orientation='h'
-        )
+        if not top_n_filtrado.empty:
+            fig = create_bar_chart(
+                top_n_filtrado,
+                x='Casos',
+                y='Diagnóstico',
+                title=f'Top {len(top_n_filtrado)} Diagnósticos en Adultos',
+                orientation='h'
+            )
 
-        fig.update_layout(
-            yaxis={'categoryorder': 'total ascending'},
-            height=800
-        )
+            fig.update_layout(
+                yaxis={'categoryorder': 'total ascending'},
+                height=max(400, len(top_n_filtrado) * 30) # Altura dinámica
+            )
 
-        st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.warning("No hay diagnósticos seleccionados para mostrar en el gráfico.")
 
     st.markdown("---")
 
