@@ -82,14 +82,30 @@ def render_sidebar(df):
             default=edades_disponibles,
         )
 
-    # --- 3. Retornar valores ---
+    st.sidebar.markdown("---")
+    
+    # --- 3. Carga de Archivos ---
+    with st.sidebar.expander("⬆️ Cargar Nuevos Datos"):
+        uploaded_file = st.file_uploader(
+            "Cargar archivo CSV de morbilidad",
+            type=['csv']
+        )
+        st.markdown(
+            """
+            <small>El archivo debe contener las columnas: `CIE10`, `Unidad`, `Año`, `Sexo`, `Edad`, `Casos`.</small>
+            """, 
+            unsafe_allow_html=True
+        )
+
+    # --- 4. Retornar valores ---
     return {
         "selected_page": menu_options[selected_page],
         "filtro_unidad": filtro_unidad,
         "filtro_año": filtro_año,
         "filtro_sexo": filtro_sexo,
         "filtro_edad": filtro_edad,
-        "total_general": total_general
+        "total_general": total_general,
+        "uploaded_file": uploaded_file
     }
 
 def render_summary_stats(stats, total_general, filtro_unidad):

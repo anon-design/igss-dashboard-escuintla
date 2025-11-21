@@ -13,10 +13,10 @@ sys.path.append(str(Path(__file__).parent.parent))
 from config import DATA_FILE, CATALOGOS_DIR
 
 
-@st.cache_data(ttl=3600)
-def load_data():
+def load_data(uploaded_file=None):
     """
     Carga, limpia y reconstruye los datos para garantizar la consistencia jerárquica.
+    Puede cargar datos desde el archivo por defecto o desde un archivo CSV subido por el usuario.
 
     LÓGICA DE CORRECCIÓN:
     1. Se confía en los datos de las unidades específicas como la fuente principal.
@@ -25,13 +25,17 @@ def load_data():
     Esto garantiza que el todo es igual a la suma de sus partes.
     """
     try:
-        df_raw = pd.read_csv(DATA_FILE)
+        if uploaded_file is not None:
+            st.info("Procesando archivo cargado...")
+            df_raw = pd.read_csv(uploaded_file)
+        else:
+            df_raw = pd.read_csv(DATA_FILE)
 
         # 1. Limpieza inicial
         required_cols = ['CIE10', 'Unidad', 'Año', 'Sexo', 'Edad', 'Casos']
         if not all(col in df_raw.columns for col in required_cols):
             missing_cols = [col for col in required_cols if col not in df_raw.columns]
-            st.error(f"Faltan columnas requeridas: {', '.join(missing_cols)}")
+            st.error(f"Faltan columnas requeridas en el archivo: {', '.join(missing_cols)}")
             return pd.DataFrame()
 
         df_raw = df_raw[~df_raw['Unidad'].str.contains('Procedencia', case=False, na=False)]
@@ -78,10 +82,10 @@ def load_data():
         return df_final
 
     except FileNotFoundError:
-        st.error(f"No se encontró el archivo de datos: {DATA_FILE}")
+        st.error(f"No se encontró el archivo de datos por defecto: {DATA_FILE}")
         return pd.DataFrame()
     except Exception as e:
-        st.error(f"Error al cargar los datos: {str(e)}")
+        st.error(f"Error al cargar o procesar los datos: {str(e)}")
         return pd.DataFrame()
 
 
