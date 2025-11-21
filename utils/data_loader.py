@@ -348,8 +348,8 @@ def load_diagnosticos_nombres():
         df = df[['Código', 'Descripción']].copy()
         df.columns = ['cie10', 'nombre']
         
-        # Normalizar códigos CIE-10 (eliminar puntos y otros caracteres)
-        df['cie10'] = df['cie10'].astype(str).str.replace(r'[^A-Z0-9]', '', regex=True)
+        # Normalizar códigos CIE-10 (eliminar puntos, espacios y convertir a mayúsculas)
+        df['cie10'] = df['cie10'].astype(str).str.replace(r'[^A-Z0-9]', '', regex=True).str.upper()
         
         # Eliminar filas donde el código es un capítulo (ej. A00-A09)
         df = df[~df['cie10'].str.contains('-')]
