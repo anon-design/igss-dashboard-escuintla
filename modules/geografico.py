@@ -250,9 +250,12 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
                 with col1:
                     tabla_top_n = top_n_filtrado.copy()
                     tabla_top_n['Casos'] = tabla_top_n['Casos'].apply(format_large_number)
-                    column_order = ['#', 'Diagnóstico', 'CIE10', 'Casos', '%', 'Es_ENO', 'Es_Cronica']
-                    tabla_top_n = tabla_top_n.rename(columns={'Rank':'#', 'Es_ENO': 'ENO', 'Es_Cronica': 'Crónica'})
-                    st.dataframe(tabla_top_n[column_order], use_container_width=True, hide_index=True)
+                    
+                    # Directamente asignar los nombres de las columnas para evitar conflictos
+                    tabla_top_n = tabla_top_n[['Rank', 'Diagnóstico', 'CIE10', 'Casos', 'Porcentaje', 'Es_ENO', 'Es_Cronica']]
+                    tabla_top_n.columns = ['#', 'Diagnóstico', 'CIE-10', 'Casos', '%', 'ENO', 'Crónica']
+                    
+                    st.dataframe(tabla_top_n, use_container_width=True, hide_index=True)
                     st.info("💡 **Leyenda:** ⚠️ = ENO | 💊 = Crónica")
 
                 with col2:

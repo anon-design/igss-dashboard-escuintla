@@ -188,25 +188,34 @@ def render(df, df_eno):
 
     st.markdown("---")
 
-    # Tendencia temporal - Top 10
-    st.subheader("📅 Tendencia Temporal - Top 10 ENO")
+    # Tendencia temporal - Top N
+    st.subheader("📅 Tendencia Temporal de las Principales ENO")
 
-    top_10_codes = top_eno.head(10)['CIE10'].tolist()
-    df_top10 = df_eno_data[df_eno_data['CIE10'].isin(top_10_codes)]
-
-    if not df_top10.empty:
-        tendencia = df_top10.groupby(['Año', 'CIE10'])['Casos'].sum().reset_index()
-
-        fig_lineas = create_line_chart(
-            tendencia,
-            x='Año',
-            y='Casos',
-            title='Evolución Temporal de las 10 ENO Más Frecuentes',
-            color='CIE10'
+    if not top_eno_filtrado.empty:
+        num_top_temporal = st.slider(
+            "Selecciona el número de ENO para el análisis temporal:", 
+            min_value=1, 
+            max_value=min(10, len(top_eno_filtrado)), 
+            value=min(5, len(top_eno_filtrado)),
+            key="slider_temporal_eno"
         )
 
-        fig_lineas.update_layout(height=500)
-        st.plotly_chart(fig_lineas, use_container_width=True)
+        top_codes_temporal = top_eno_filtrado.head(num_top_temporal)['CIE10'].tolist()
+        df_top_temporal = df_eno_data[df_eno_data['CIE10'].isin(top_codes_temporal)]
+
+        if not df_top_temporal.empty:
+            tendencia = df_top_temporal.groupby(['Año', 'nombre'])['Casos'].sum().reset_index()
+
+            fig_lineas = create_line_chart(
+                tendencia,
+                x='Año',
+                y='Casos',
+                title=f'Evolución Temporal de las {num_top_temporal} ENO Más Frecuentes',
+                color='nombre'
+            )
+            st.plotly_chart(fig_lineas, use_container_width=True)
+    else:
+        st.warning("No hay enfermedades seleccionadas para mostrar análisis temporal.")
 
     st.markdown("---")
 
