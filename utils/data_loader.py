@@ -336,32 +336,52 @@ def get_data_summary(df):
 @st.cache_data
 def load_diagnosticos_nombres():
     """
-    Carga el catálogo completo de nombres de diagnósticos desde el archivo Excel.
+    Carga el catálogo completo de nombres de diagnósticos, combinando el archivo
+    principal de Excel con un archivo de parche (patch) para códigos faltantes.
     """
+    df_main = pd.DataFrame()
+    df_patch = pd.DataFrame()
+
+    # 1. Cargar el archivo principal de Excel
     try:
         file_path = CATALOGOS_DIR / "diagnosticos_nombres.xlsx"
         sheet_name = 'ES2024 Completa + Marcadores'
-        
-        df = pd.read_excel(file_path, sheet_name=sheet_name, header=0)
-        
-        # Seleccionar y renombrar columnas
-        df = df[['Código', 'Descripción']].copy()
-        df.columns = ['cie10', 'nombre']
-        
-        # Normalizar códigos CIE-10 (eliminar puntos, espacios y convertir a mayúsculas)
-        df['cie10'] = df['cie10'].astype(str).str.replace(r'[^A-Z0-9]', '', regex=True).str.upper()
-        
-        # Eliminar filas donde el código es un capítulo (ej. A00-A09)
-        df = df[~df['cie10'].str.contains('-')]
-        
-        df.dropna(subset=['cie10', 'nombre'], inplace=True)
-        df.drop_duplicates(subset=['cie10'], inplace=True)
-        
-        return df
-
+        df_main = pd.read_excel(file_path, sheet_name=sheet_name, header=0)
+        df_main = df_main[['Código', 'Descripción']].copy()
+        df_main.columns = ['cie10', 'nombre']
     except FileNotFoundError:
-        st.error(f"No se encontró el archivo de nombres de diagnósticos: {file_path}")
-        return pd.DataFrame()
+        st.warning(f"Archivo principal de nombres no encontrado: {file_path}. Se usarán solo parches.")
     except Exception as e:
-        st.error(f"Error al cargar nombres de diagnósticos: {str(e)}")
+        st.error(f"Error al cargar el archivo Excel de diagnósticos: {e}")
+
+    # 2. Cargar el archivo de parche CSV
+    try:
+        patch_path = CATALOGOS_DIR / "patch_nombres.csv"
+        df_patch = pd.read_csv(patch_path)
+        # Asegurarse que el parche tenga las columnas correctas
+        if 'cie10' in df_patch.columns and 'nombre' in df_patch.columns:
+            df_patch['cie10'] = df_patch['cie10'].astype(str).str.upper()
+        else:
+            st.warning(f"Archivo de parche {patch_path} no tiene el formato esperado (cie10, nombre).")
+            df_patch = pd.DataFrame()
+    except FileNotFoundError:
+        # No es un error si el parche no existe
+        pass
+    except Exception as e:
+        st.error(f"Error al cargar el archivo de parche de diagnósticos: {e}")
+
+    # 3. Combinar ambos, dando prioridad al parche
+    # Se coloca el parche primero y luego se eliminan duplicados manteniendo el primero.
+    df_combined = pd.concat([df_patch, df_main], ignore_index=True)
+    
+    if df_combined.empty:
+        st.error("No se pudo cargar ningún catálogo de nombres de diagnóstico.")
         return pd.DataFrame()
+
+    # 4. Normalizar y limpiar
+    df_combined.dropna(subset=['cie10', 'nombre'], inplace=True)
+    df_combined['cie10'] = df_combined['cie10'].astype(str).str.replace(r'[^A-Z0-9]', '', regex=True).str.upper()
+    df_combined = df_combined[~df_combined['cie10'].str.contains('-')]
+    df_combined.drop_duplicates(subset=['cie10'], keep='first', inplace=True)
+    
+    return df_combined
