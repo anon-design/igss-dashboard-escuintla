@@ -60,13 +60,13 @@ def main():
     if current_uploaded_file_hash != st.session_state['uploaded_file_hash']:
         load_and_store_data(filtros["uploaded_file"])
         # Necesitamos re-ejecutar toda la aplicación para que los cambios se reflejen
-        st.experimental_rerun()
+        st.rerun()
         
     # Si no hay datos cargados (ni por defecto ni subidos), cargar por defecto.
     if st.session_state['datos'] is None:
         load_and_store_data(None)
         # Una vez cargados los datos por defecto, re-ejecutar.
-        st.experimental_rerun()
+        st.rerun()
 
     # Desempaquetar los datos de la sesión para su uso.
     datos = st.session_state['datos']

@@ -79,15 +79,17 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
     # Top N diagnósticos
     st.subheader("📊 Top N Diagnósticos Más Frecuentes")
 
-    # Widget para seleccionar N
-    top_n_value = st.number_input(
-        "Selecciona el número de diagnósticos a mostrar (N):",
-        min_value=5,
-        max_value=100,
-        value=25,
-        step=5
-    )
-
+    top_n_value = 25 # Default value
+    with st.expander("⚙️ Opciones de Visualización"):
+        # Widget para seleccionar N
+        top_n_value = st.number_input(
+            "Selecciona el número de diagnósticos a mostrar (N):",
+            min_value=5,
+            max_value=100,
+            value=25,
+            step=5
+        )
+    
     top_n = get_top_n(df_adultos, n=top_n_value, group_by='CIE10')
 
     if not top_n.empty:
@@ -96,13 +98,14 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
         top_n['Diagnóstico'] = top_n['nombre'].fillna('Nombre no disponible')
         top_n.drop(columns=['cie10', 'nombre'], inplace=True)
         
-        # Filtro de exclusión
-        diagnosticos_disponibles = top_n['Diagnóstico'].tolist()
-        diagnosticos_seleccionados = st.multiselect(
-            "Selecciona los diagnósticos a incluir en la tabla y gráfico:",
-            options=diagnosticos_disponibles,
-            default=diagnosticos_disponibles
-        )
+        with st.expander("Filtro de Exclusión de Diagnósticos", expanded=False):
+            # Filtro de exclusión
+            diagnosticos_disponibles = top_n['Diagnóstico'].tolist()
+            diagnosticos_seleccionados = st.multiselect(
+                "Selecciona los diagnósticos a incluir en la tabla y gráfico:",
+                options=diagnosticos_disponibles,
+                default=diagnosticos_disponibles
+            )
         
         # Filtrar el dataframe basado en la selección
         top_n_filtrado = top_n[top_n['Diagnóstico'].isin(diagnosticos_seleccionados)]
@@ -158,66 +161,74 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
 
     st.markdown("---")
 
-    # Análisis temporal del Top 10
-    st.subheader("📅 Tendencia Temporal - Top 10 Diagnósticos")
-
-    top_10_codes = top_25.head(10)['CIE10'].tolist()
-    df_top10 = df_adultos[df_adultos['CIE10'].isin(top_10_codes)]
-
-    # Agrupar por año y código
-    tendencia = df_top10.groupby(['Año', 'CIE10'])['Casos'].sum().reset_index()
-
-    if not tendencia.empty:
-        fig_lineas = create_line_chart(
-            tendencia,
-            x='Año',
-            y='Casos',
-            title='Evolución Temporal de los 10 Diagnósticos Más Frecuentes',
-            color='CIE10'
+    # Análisis temporal del Top N
+    st.subheader("📅 Tendencia Temporal de los Diagnósticos Principales")
+    
+    if not top_n_filtrado.empty:
+        num_top_temporal = st.slider(
+            "Selecciona el número de diagnósticos para el análisis temporal:", 
+            min_value=1, 
+            max_value=min(10, len(top_n_filtrado)), 
+            value=min(5, len(top_n_filtrado)),
+            key="slider_temporal_adultos"
         )
 
-        fig_lineas.update_layout(height=500)
+        top_codes_temporal = top_n_filtrado.head(num_top_temporal)['CIE10'].tolist()
+        df_top_temporal = df_adultos[df_adultos['CIE10'].isin(top_codes_temporal)]
 
-        st.plotly_chart(fig_lineas, use_container_width=True)
+        # Agrupar por año y código
+        tendencia = df_top_temporal.groupby(['Año', 'CIE10'])['Casos'].sum().reset_index()
+        
+        # Unir nombres para la leyenda del gráfico
+        tendencia = pd.merge(tendencia, top_n_filtrado[['CIE10', 'Diagnóstico']], on='CIE10', how='left')
 
-    st.markdown("---")
 
-    # Distribución por sexo del Top 10
-    st.subheader("👥 Distribución por Sexo - Top 10 Diagnósticos")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        # Por sexo
-        dist_sexo = df_top10.groupby(['CIE10', 'Sexo'])['Casos'].sum().reset_index()
-
-        if not dist_sexo.empty:
-            from utils.colors import create_stacked_bar
-
-            fig_sexo = create_stacked_bar(
-                dist_sexo,
-                x='CIE10',
+        if not tendencia.empty:
+            fig_lineas = create_line_chart(
+                tendencia,
+                x='Año',
                 y='Casos',
-                title='Distribución por Sexo',
-                color='Sexo'
+                title=f'Evolución Temporal de los {num_top_temporal} Diagnósticos Más Frecuentes',
+                color='Diagnóstico' # Usar nombre del diagnóstico en la leyenda
+            )
+            st.plotly_chart(fig_lineas, use_container_width=True)
+
+        st.markdown("---")
+
+        # Distribución por sexo del Top N
+        st.subheader(f"👥 Distribución por Sexo - Top {num_top_temporal} Diagnósticos")
+
+        col1, col2 = st.columns([3, 2])
+
+        with col1:
+            # Por sexo
+            dist_sexo = df_top_temporal.groupby(['Diagnóstico', 'Sexo'])['Casos'].sum().reset_index()
+
+            if not dist_sexo.empty:
+                fig_sexo = create_stacked_bar(
+                    dist_sexo,
+                    x='Diagnóstico',
+                    y='Casos',
+                    title='Distribución por Sexo',
+                    color='Sexo'
+                )
+                st.plotly_chart(fig_sexo, use_container_width=True)
+
+        with col2:
+            # Tabla resumen por sexo
+            pivot_sexo = df_top_temporal.pivot_table(
+                index='Diagnóstico',
+                columns='Sexo',
+                values='Casos',
+                aggfunc='sum',
+                fill_value=0
             )
 
-            fig_sexo.update_layout(height=400)
-            st.plotly_chart(fig_sexo, use_container_width=True)
-
-    with col2:
-        # Tabla resumen por sexo
-        pivot_sexo = df_top10.pivot_table(
-            index='CIE10',
-            columns='Sexo',
-            values='Casos',
-            aggfunc='sum',
-            fill_value=0
-        )
-
-        if not pivot_sexo.empty:
-            st.markdown("**Resumen Numérico:**")
-            st.dataframe(pivot_sexo.style.format("{:,.0f}"), use_container_width=True)
+            if not pivot_sexo.empty:
+                st.markdown("**Resumen Numérico:**")
+                st.dataframe(pivot_sexo.style.format("{:,.0f}"), use_container_width=True)
+    else:
+        st.warning("No hay diagnósticos seleccionados para mostrar análisis temporal o por sexo.")
 
     st.markdown("---")
 

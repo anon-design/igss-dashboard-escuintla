@@ -57,7 +57,7 @@ def load_data(uploaded_file=None):
         df_raw.dropna(subset=['Año'], inplace=True)
         df_raw['Año'] = df_raw['Año'].astype(int)
         df_raw['Casos'] = pd.to_numeric(df_raw['Casos'], errors='coerce').fillna(0).astype(int)
-        df_raw['CIE10'] = df_raw['CIE10'].astype(str).str.strip().str.upper()
+        df_raw['CIE10'] = df_raw['CIE10'].astype(str).str.replace(r'[^A-Z0-9]', '', regex=True).str.upper()
 
         # 2. Separar las partes del "todo" original
         unidades_especificas_nombres = [
@@ -76,7 +76,7 @@ def load_data(uploaded_file=None):
             on=group_cols,
             how='left'
         )
-        df_merged['Casos_Especificas'].fillna(0, inplace=True)
+        df_merged['Casos_Especificas'] = df_merged['Casos_Especificas'].fillna(0)
         df_merged['Casos_Otros'] = (df_merged['Casos'] - df_merged['Casos_Especificas']).clip(lower=0)
 
         df_otros = df_merged[df_merged['Casos_Otros'] > 0][group_cols + ['Casos_Otros']].copy()
