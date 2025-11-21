@@ -12,7 +12,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from config import COLORS
 from utils.filters import filter_by_age_group, get_top_n, aggregate_by_period
-from utils.colors import create_bar_chart, create_line_chart, create_metric_card_html, format_large_number
+from utils.colors import create_bar_chart, create_line_chart, create_metric_card_html, format_large_number, create_stacked_bar
 
 
 def render(df, df_eno, df_cronicas, df_diagnosticos):
