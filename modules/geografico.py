@@ -22,15 +22,12 @@ from utils.colors import (
 )
 
 
-def render(df, df_eno, df_cronicas, df_capitulos):
+def render(df):
     """
     Renderiza el módulo de análisis geográfico
 
     Args:
         df: DataFrame filtrado con datos
-        df_eno: DataFrame con catálogo ENO
-        df_cronicas: DataFrame con catálogo de crónicas
-        df_capitulos: DataFrame con catálogo de capítulos CIE-10
     """
     st.title("🗺️ Análisis Geográfico")
     st.markdown("### Distribución de casos por unidad médica del IGSS Escuintla")

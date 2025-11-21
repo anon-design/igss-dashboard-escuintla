@@ -15,6 +15,7 @@ Sistema de visualización y análisis de datos epidemiológicos que procesa y pr
 
 ## Características
 
+- Carga de datos personalizada vía CSV desde la interfaz de usuario
 - Visualizaciones interactivas con Plotly
 - Filtros dinámicos por unidad, año, sexo y edad
 - Identificación automática de ENO y enfermedades crónicas
@@ -58,7 +59,20 @@ pip install -r requirements.txt
 
 ### 4. Preparar datos
 
-Asegúrate de tener el archivo de datos consolidado en la ubicación correcta:
+El dashboard utiliza un archivo de datos consolidado por defecto. Sin embargo, ahora puedes cargar tus propios datos CSV directamente desde la interfaz gráfica de usuario.
+
+**Estructura requerida para archivos CSV:**
+
+Si decides cargar tu propio archivo CSV, asegúrate de que contenga las siguientes columnas con los nombres exactos (respetando mayúsculas y minúsculas):
+
+-   `CIE10`: Código CIE-10 del diagnóstico (ej. "I10", "A00")
+-   `Unidad`: Nombre de la unidad médica (ej. "Hospital Escuintla", "Otros")
+-   `Año`: Año del registro (formato numérico, ej. "2023")
+-   `Sexo`: Sexo del paciente (ej. "FEMENINO", "MASCULINO", "NO ESPECIFICADO")
+-   `Edad`: Rango de edad (ej. "0-15", ">61")
+-   `Casos`: Número de casos (formato numérico, ej. "1234")
+
+El dashboard realizará validaciones básicas para asegurar que la estructura y los tipos de datos sean correctos.
 
 ```
 /claude/bases_limpias/Rangos_CONSOLIDADA.csv
@@ -86,6 +100,7 @@ El dashboard se abrirá automáticamente en tu navegador web en `http://localhos
 
 1. **Barra lateral izquierda**: Contiene los filtros globales y el menú de navegación
    - Filtros: Unidad, Año, Sexo, Edad
+   - **Cargar Nuevos Datos**: Expander para subir un archivo CSV personalizado.
    - Navegación: Selecciona el módulo de análisis que deseas ver
 
 2. **Panel principal**: Muestra el contenido del módulo seleccionado
@@ -152,25 +167,35 @@ dashboard/
 ├── requirements.txt                # Dependencias del proyecto
 ├── README.md                       # Este archivo
 │
-├── data/                           # Catálogos de datos
-│   ├── capitulos_cie10.csv        # Catálogo de capítulos CIE-10
-│   ├── catalogo_eno.csv           # Catálogo de ENO
-│   └── catalogo_cronicas.csv      # Catálogo de enfermedades crónicas
+├── catalogos/                      # Catálogos de datos de referencia (CIE-10, ENO, Crónicas, etc.)
+│   ├── cie10_capitulos.csv         # Catálogo de capítulos CIE-10
+│   ├── cie10_cronicas.csv          # Catálogo de enfermedades crónicas
+│   ├── cie10_eno.csv               # Catálogo de ENO
+│   ├── cie10_nombres_generales.xlsx # Catálogo completo de nombres CIE-10 (descargado)
+│   └── diagnosticos_nombres.xlsx   # Catálogo de nombres CIE-10 (proporcionado por el usuario)
 │
-├── modules/                        # Módulos de análisis
+├── modules/                        # Módulos de análisis específicos (adultos, pediátricos, etc.)
 │   ├── __init__.py
-│   ├── morbilidad_adultos.py     # Análisis adultos
-│   ├── morbilidad_pediatrica.py  # Análisis pediátrico
-│   ├── capitulos.py               # Análisis por capítulos
-│   ├── eno.py                     # Análisis ENO
-│   ├── cronicas.py                # Análisis crónicas
-│   └── geografico.py              # Análisis geográfico
+│   ├── morbilidad_adultos.py
+│   ├── morbilidad_pediatrica.py
+│   ├── capitulos.py
+│   ├── eno.py
+│   ├── cronicas.py
+│   └── geografico.py
 │
-└── utils/                          # Utilidades
+├── static/                         # Archivos estáticos (ej. logo de la institución)
+│   └── logo.png                    # Placeholder para el logo
+│
+├── ui/                             # Componentes de la interfaz de usuario (sidebar, main_page)
+│   ├── __init__.py
+│   ├── main_page.py
+│   └── sidebar.py
+│
+└── utils/                          # Utilidades generales (carga de datos, filtros, colores)
     ├── __init__.py
-    ├── data_loader.py             # Carga de datos y caché
-    ├── filters.py                 # Funciones de filtrado
-    └── colors.py                  # Paleta de colores y gráficos
+    ├── data_loader.py
+    ├── filters.py
+    └── colors.py
 ```
 
 ## Personalización
@@ -267,6 +292,14 @@ Todos los derechos reservados.
 Este dashboard es de uso interno del IGSS y no debe ser distribuido sin autorización.
 
 ## Changelog
+
+### Versión 1.0.1 (2025-11)
+- **Corrección de Consistencia de Datos**: Implementada una lógica robusta para asegurar que el total de 'General Escuintla' sea matemáticamente consistente con la suma de sus unidades específicas y 'Otros', resolviendo discrepancias en el archivo fuente.
+- **Nombres de Diagnósticos CIE-10 Completos**: Integrado un catálogo exhaustivo de nombres de diagnósticos CIE-10, eliminando los 'Nombre no disponible' en las tablas de Top 25.
+- **Refactorización Modular de la UI**: La interfaz de usuario (`app.py`, `ui/sidebar.py`, `ui/main_page.py`) ha sido refactorizada para una mayor claridad y mantenibilidad.
+- **Nueva Característica: Carga de CSV**: Implementada la funcionalidad para que los usuarios puedan cargar sus propios archivos CSV de morbilidad directamente desde la interfaz, con validación de estructura.
+- **Estandarización Visual**: Optimización y estandarización de la aplicación del tema IGSS a todos los gráficos de Plotly.
+- **Control de Versiones**: Proyecto inicializado y conectado a un repositorio privado de GitHub para un control de cambios eficiente.
 
 ### Versión 1.0.0 (2025-11)
 - Lanzamiento inicial

@@ -78,15 +78,7 @@ def create_bar_chart(df, x, y, title='', orientation='v', color=None):
         fig = px.bar(df, x=x, y=y, title=title, orientation=orientation,
                      color_discrete_sequence=[COLORS['primary']])
 
-    fig.update_layout(
-        font=PLOTLY_TEMPLATE['layout']['font'],
-        title_font=PLOTLY_TEMPLATE['layout']['title']['font'],
-        paper_bgcolor=PLOTLY_TEMPLATE['layout']['paper_bgcolor'],
-        plot_bgcolor=PLOTLY_TEMPLATE['layout']['plot_bgcolor'],
-        hovermode=PLOTLY_TEMPLATE['layout']['hovermode']
-    )
-
-    return fig
+    return apply_igss_theme(fig)
 
 
 def create_line_chart(df, x, y, title='', color=None):
@@ -110,18 +102,10 @@ def create_line_chart(df, x, y, title='', color=None):
         fig = px.line(df, x=x, y=y, title=title,
                       color_discrete_sequence=[COLORS['primary']])
 
-    fig.update_layout(
-        font=PLOTLY_TEMPLATE['layout']['font'],
-        title_font=PLOTLY_TEMPLATE['layout']['title']['font'],
-        paper_bgcolor=PLOTLY_TEMPLATE['layout']['paper_bgcolor'],
-        plot_bgcolor=PLOTLY_TEMPLATE['layout']['plot_bgcolor'],
-        hovermode=PLOTLY_TEMPLATE['layout']['hovermode']
-    )
-
     # Mejorar líneas
     fig.update_traces(line=dict(width=3))
 
-    return fig
+    return apply_igss_theme(fig)
 
 
 def create_pie_chart(df, values, names, title=''):
@@ -140,15 +124,9 @@ def create_pie_chart(df, values, names, title=''):
     fig = px.pie(df, values=values, names=names, title=title,
                  color_discrete_sequence=COLORS['categorical'])
 
-    fig.update_layout(
-        font=PLOTLY_TEMPLATE['layout']['font'],
-        title_font=PLOTLY_TEMPLATE['layout']['title']['font'],
-        paper_bgcolor=PLOTLY_TEMPLATE['layout']['paper_bgcolor']
-    )
-
     fig.update_traces(textposition='inside', textinfo='percent+label')
 
-    return fig
+    return apply_igss_theme(fig)
 
 
 def create_heatmap(df, title=''):
@@ -170,14 +148,9 @@ def create_heatmap(df, title=''):
         hoverongaps=False
     ))
 
-    fig.update_layout(
-        title=title,
-        font=PLOTLY_TEMPLATE['layout']['font'],
-        title_font=PLOTLY_TEMPLATE['layout']['title']['font'],
-        paper_bgcolor=PLOTLY_TEMPLATE['layout']['paper_bgcolor']
-    )
+    fig.update_layout(title=title)
 
-    return fig
+    return apply_igss_theme(fig)
 
 
 def create_stacked_bar(df, x, y, title='', color=None):
@@ -197,15 +170,7 @@ def create_stacked_bar(df, x, y, title='', color=None):
     fig = px.bar(df, x=x, y=y, title=title, color=color, barmode='stack',
                  color_discrete_sequence=COLORS['categorical'])
 
-    fig.update_layout(
-        font=PLOTLY_TEMPLATE['layout']['font'],
-        title_font=PLOTLY_TEMPLATE['layout']['title']['font'],
-        paper_bgcolor=PLOTLY_TEMPLATE['layout']['paper_bgcolor'],
-        plot_bgcolor=PLOTLY_TEMPLATE['layout']['plot_bgcolor'],
-        hovermode=PLOTLY_TEMPLATE['layout']['hovermode']
-    )
-
-    return fig
+    return apply_igss_theme(fig)
 
 
 def format_large_number(n):

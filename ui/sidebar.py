@@ -15,8 +15,10 @@ def render_sidebar(df):
     Returns:
         dict: Un diccionario con todos los valores de los filtros seleccionados.
     """
-    st.sidebar.image("https://via.placeholder.com/250x80/0066A8/FFFFFF?text=IGSS+Escuintla",
-                     use_column_width=True)
+    st.sidebar.markdown(
+        "<h2 style='text-align: center; color: #0066A8;'>IGSS Escuintla Logo</h2>",
+        unsafe_allow_html=True
+    )
 
     st.sidebar.title("📊 Dashboard Epidemiológico")
     st.sidebar.markdown("---")
