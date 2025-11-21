@@ -96,7 +96,7 @@ def main():
         "capitulos": lambda: capitulos.render(df_filtrado, datos['capitulos']),
         "eno": lambda: eno.render(df_filtrado, datos['eno']),
         "cronicas": lambda: cronicas.render(df_filtrado, datos['cronicas']),
-        "geografico": lambda: geografico.render(df_filtrado, datos['eno'], datos['cronicas'])
+        "geografico": lambda: geografico.render(df_filtrado, datos['eno'], datos['cronicas'], datos['diagnosticos'])
     }
     
     # Ejecutar la función de renderizado de la página seleccionada.

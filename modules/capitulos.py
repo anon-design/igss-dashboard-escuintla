@@ -124,48 +124,72 @@ def render(df, df_capitulos):
 
     st.markdown("---")
 
-    # Gráfico circular - Top 10 capítulos
-    st.subheader("🥧 Top 10 Capítulos - Distribución Porcentual")
+    # Gráfico circular - Top N capítulos
+    st.subheader("🥧 Top N Capítulos - Distribución Porcentual")
+
+    # Contenedor para los filtros
+    with st.expander("⚙️ Opciones de Visualización"):
+        num_top_capitulos = st.slider(
+            "Selecciona el número de capítulos a mostrar:",
+            min_value=3,
+            max_value=len(casos_por_capitulo),
+            value=min(10, len(casos_por_capitulo)),
+            key="slider_top_capitulos"
+        )
+        
+        # Filtro de exclusión
+        capitulos_disponibles = casos_por_capitulo['Capitulo'].tolist()
+        capitulos_seleccionados = st.multiselect(
+            "Selecciona los capítulos a incluir en el análisis:",
+            options=capitulos_disponibles,
+            default=capitulos_disponibles,
+            key="exclude_filter_capitulos"
+        )
+
+    # Aplicar filtro de exclusión
+    casos_por_capitulo_filtrado = casos_por_capitulo[casos_por_capitulo['Capitulo'].isin(capitulos_seleccionados)]
+
 
     col1, col2 = st.columns(2)
 
     with col1:
-        if not casos_por_capitulo.empty:
-            top_10_capitulos = casos_por_capitulo.head(10).copy()
+        if not casos_por_capitulo_filtrado.empty:
+            top_n_capitulos = casos_por_capitulo_filtrado.head(num_top_capitulos).copy()
 
-            # Agregar categoría "Otros" si hay más de 10 capítulos
-            if len(casos_por_capitulo) > 10:
-                otros_casos = casos_por_capitulo.iloc[10:]['Casos'].sum()
+            # Agregar categoría "Otros" si hay más capítulos de los seleccionados para mostrar
+            if len(casos_por_capitulo_filtrado) > num_top_capitulos:
+                otros_casos = casos_por_capitulo_filtrado.iloc[num_top_capitulos:]['Casos'].sum()
                 otros_row = pd.DataFrame({
-                    'Capitulo': ['Otros'],
-                    'Casos': [otros_casos],
-                    'Porcentaje': [(otros_casos / total_casos * 100)]
+                    'Capitulo': ['Otros Capítulos'],
+                    'Casos': [otros_casos]
                 })
-                top_10_capitulos = pd.concat([top_10_capitulos, otros_row], ignore_index=True)
+                data_pie = pd.concat([top_n_capitulos, otros_row], ignore_index=True)
+            else:
+                data_pie = top_n_capitulos.copy()
 
             # Simplificar nombres para el gráfico
-            top_10_capitulos['Capitulo_Corto'] = top_10_capitulos['Capitulo'].apply(
+            data_pie['Capitulo_Corto'] = data_pie['Capitulo'].apply(
                 lambda x: x[:40] + '...' if len(x) > 40 else x
             )
 
             fig_pie = create_pie_chart(
-                top_10_capitulos,
+                data_pie,
                 values='Casos',
                 names='Capitulo_Corto',
-                title='Top 10 Capítulos'
+                title=f'Top {num_top_capitulos} Capítulos'
             )
 
             fig_pie.update_layout(height=500)
             st.plotly_chart(fig_pie, use_container_width=True)
 
     with col2:
-        if not casos_por_capitulo.empty:
-            st.markdown("**Top 10 Capítulos:**")
-            top_10_display = casos_por_capitulo.head(10).copy()
-            top_10_display['Casos'] = top_10_display['Casos'].apply(format_large_number)
-            top_10_display = top_10_display[['Rank', 'Capitulo', 'Casos', 'Porcentaje']]
-            top_10_display.columns = ['#', 'Capítulo', 'Casos', '%']
-            st.dataframe(top_10_display, use_container_width=True, hide_index=True)
+        if not casos_por_capitulo_filtrado.empty:
+            st.markdown(f"**Top {num_top_capitulos} Capítulos:**")
+            top_display = casos_por_capitulo_filtrado.head(num_top_capitulos).copy()
+            top_display['Casos'] = top_display['Casos'].apply(format_large_number)
+            top_display = top_display[['Rank', 'Capitulo', 'Casos', 'Porcentaje']]
+            top_display.columns = ['#', 'Capítulo', 'Casos', '%']
+            st.dataframe(top_display, use_container_width=True, hide_index=True, height=450)
 
     st.markdown("---")
 

@@ -93,39 +93,65 @@ def render(df, df_eno):
 
     st.markdown("---")
 
-    # Top 20 ENO
-    st.subheader("📊 Top 20 Enfermedades de Notificación Obligatoria")
+    # Top N ENO
+    st.subheader("📊 Top N Enfermedades de Notificación Obligatoria")
 
-    top_eno = df_eno_data.groupby(['CIE10', 'nombre', 'categoria', 'notificacion'])['Casos'].sum().reset_index()
-    top_eno = top_eno.sort_values('Casos', ascending=False).head(20)
-    top_eno['Rank'] = range(1, len(top_eno) + 1)
-    top_eno['Porcentaje'] = (top_eno['Casos'] / total_casos * 100).round(2)
+    # --- Filtros Dinámicos ---
+    with st.expander("⚙️ Opciones de Visualización"):
+        top_n_value = st.number_input(
+            "Selecciona el número de enfermedades a mostrar (N):",
+            min_value=5,
+            max_value=50,
+            value=20,
+            step=5,
+            key="top_n_eno"
+        )
+    
+    # Calcular todos los ENOs y luego filtrar
+    all_eno = df_eno_data.groupby(['CIE10', 'nombre', 'categoria', 'notificacion'])['Casos'].sum().reset_index()
+    all_eno = all_eno.sort_values('Casos', ascending=False)
 
-    # Tabla formateada
-    tabla_display = top_eno.copy()
-    tabla_display['Casos'] = tabla_display['Casos'].apply(format_large_number)
-    tabla_display = tabla_display[['Rank', 'CIE10', 'nombre', 'categoria', 'notificacion', 'Casos', 'Porcentaje']]
-    tabla_display.columns = ['#', 'CIE-10', 'Enfermedad', 'Categoría', 'Notificación', 'Casos', '%']
+    with st.expander("Filtro de Exclusión de Enfermedades", expanded=False):
+        diagnosticos_disponibles = all_eno['nombre'].tolist()
+        diagnosticos_seleccionados = st.multiselect(
+            "Selecciona las enfermedades a incluir:",
+            options=diagnosticos_disponibles,
+            default=diagnosticos_disponibles,
+            key="exclude_filter_eno"
+        )
+    
+    # Aplicar filtros
+    top_eno_filtrado = all_eno[all_eno['nombre'].isin(diagnosticos_seleccionados)].head(top_n_value)
+    
+    if not top_eno_filtrado.empty:
+        top_eno_filtrado['Rank'] = range(1, len(top_eno_filtrado) + 1)
+        top_eno_filtrado['Porcentaje'] = (top_eno_filtrado['Casos'] / total_casos * 100).round(2)
 
-    st.dataframe(tabla_display, use_container_width=True, hide_index=True)
+        # Tabla formateada
+        tabla_display = top_eno_filtrado.copy()
+        tabla_display['Casos'] = tabla_display['Casos'].apply(format_large_number)
+        tabla_display = tabla_display[['Rank', 'CIE10', 'nombre', 'categoria', 'notificacion', 'Casos', 'Porcentaje']]
+        tabla_display.columns = ['#', 'CIE-10', 'Enfermedad', 'Categoría', 'Notificación', 'Casos', '%']
 
-    # Gráfico de barras
-    st.subheader("📈 Visualización Top 20 ENO")
+        st.dataframe(tabla_display, use_container_width=True, hide_index=True)
 
-    fig = create_bar_chart(
-        top_eno,
-        x='Casos',
-        y='CIE10',
-        title='Top 20 Enfermedades de Notificación Obligatoria',
-        orientation='h'
-    )
+        # Gráfico de barras
+        st.subheader(f"📈 Visualización Top {len(top_eno_filtrado)} ENO")
 
-    fig.update_layout(
-        yaxis={'categoryorder': 'total ascending'},
-        height=700
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
+        fig = create_bar_chart(
+            top_eno_filtrado,
+            x='Casos',
+            y='nombre', # Usar nombre para el eje Y
+            title=f'Top {len(top_eno_filtrado)} Enfermedades de Notificación Obligatoria',
+            orientation='h'
+        )
+        fig.update_layout(
+            yaxis={'categoryorder': 'total ascending'},
+            height=max(400, len(top_eno_filtrado) * 35)
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning("No hay enfermedades seleccionadas para mostrar.")
 
     st.markdown("---")
 

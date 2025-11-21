@@ -22,7 +22,7 @@ from utils.colors import (
 )
 
 
-def render(df, df_eno, df_cronicas):
+def render(df, df_eno, df_cronicas, df_diagnosticos):
     """
     Renderiza el módulo de análisis geográfico
 
@@ -30,6 +30,7 @@ def render(df, df_eno, df_cronicas):
         df: DataFrame filtrado con datos
         df_eno: DataFrame con catálogo ENO
         df_cronicas: DataFrame con catálogo de crónicas
+        df_diagnosticos: DataFrame con el catálogo completo de nombres de CIE-10
     """
     st.title("🗺️ Análisis Geográfico")
     st.markdown("### Distribución de casos por unidad médica del IGSS Escuintla")
@@ -182,65 +183,94 @@ def render(df, df_eno, df_cronicas):
 
     st.markdown("---")
 
-    # Top 10 diagnósticos por unidad
-    st.subheader("🔍 Top 10 Diagnósticos por Unidad")
+    # Top N diagnósticos por unidad
+    st.subheader("🔍 Top N Diagnósticos por Unidad")
 
     # Selector de unidad
     unidades_disponibles = sorted(df['Unidad'].unique())
     unidad_seleccionada = st.selectbox(
         "Selecciona una unidad para ver sus diagnósticos más frecuentes:",
         unidades_disponibles,
-        index=0
+        index=0,
+        key="unidad_selector_geografico"
     )
 
     if unidad_seleccionada:
         df_unidad = df[df['Unidad'] == unidad_seleccionada]
 
         if not df_unidad.empty:
-            # Top 10 diagnósticos de la unidad seleccionada
-            top_10_unidad = df_unidad.groupby('CIE10')['Casos'].sum().reset_index()
-            top_10_unidad = top_10_unidad.sort_values('Casos', ascending=False).head(10)
-            top_10_unidad['Rank'] = range(1, len(top_10_unidad) + 1)
+            # --- Filtros Dinámicos ---
+            with st.expander("⚙️ Opciones de Visualización"):
+                top_n_value = st.number_input(
+                    "Selecciona el número de diagnósticos a mostrar (N):",
+                    min_value=5,
+                    max_value=50,
+                    value=10,
+                    step=5,
+                    key="top_n_geografico"
+                )
+            
+            # Calcular todos los diagnósticos de la unidad
+            all_diagnosticos_unidad = df_unidad.groupby('CIE10')['Casos'].sum().reset_index()
+            all_diagnosticos_unidad = all_diagnosticos_unidad.sort_values('Casos', ascending=False)
+            
+            # Unir nombres ANTES del filtro de exclusión
+            all_diagnosticos_unidad = pd.merge(all_diagnosticos_unidad, df_diagnosticos, left_on='CIE10', right_on='cie10', how='left')
+            all_diagnosticos_unidad['Diagnóstico'] = all_diagnosticos_unidad['nombre'].fillna('Nombre no disponible')
+            all_diagnosticos_unidad.drop(columns=['cie10', 'nombre'], inplace=True)
 
-            total_unidad = df_unidad['Casos'].sum()
-            top_10_unidad['Porcentaje'] = (top_10_unidad['Casos'] / total_unidad * 100).round(2)
+            with st.expander("Filtro de Exclusión de Diagnósticos", expanded=False):
+                diagnosticos_disponibles = all_diagnosticos_unidad['Diagnóstico'].tolist()
+                diagnosticos_seleccionados = st.multiselect(
+                    "Selecciona los diagnósticos a incluir:",
+                    options=diagnosticos_disponibles,
+                    default=diagnosticos_disponibles,
+                    key="exclude_filter_geografico"
+                )
+            
+            # Aplicar filtros
+            top_n_filtrado = all_diagnosticos_unidad[all_diagnosticos_unidad['Diagnóstico'].isin(diagnosticos_seleccionados)].head(top_n_value)
 
-            # Marcar ENO y crónicas
-            top_10_unidad['Es_ENO'] = top_10_unidad['CIE10'].apply(
-                lambda x: '⚠️' if x in df_eno['cie10'].values else ''
-            )
-            top_10_unidad['Es_Cronica'] = top_10_unidad['CIE10'].apply(
-                lambda x: '💊' if x in df_cronicas['cie10'].values else ''
-            )
+            if not top_n_filtrado.empty:
+                top_n_filtrado['Rank'] = range(1, len(top_n_filtrado) + 1)
+                total_unidad = df_unidad['Casos'].sum()
+                top_n_filtrado['Porcentaje'] = (top_n_filtrado['Casos'] / total_unidad * 100).round(2)
 
-            # Tabla formateada
-            col1, col2 = st.columns([2, 1])
-
-            with col1:
-                tabla_top10 = top_10_unidad.copy()
-                tabla_top10['Casos'] = tabla_top10['Casos'].apply(format_large_number)
-                tabla_top10 = tabla_top10[['Rank', 'CIE10', 'Casos', 'Porcentaje', 'Es_ENO', 'Es_Cronica']]
-                tabla_top10.columns = ['#', 'CIE-10', 'Casos', '%', 'ENO', 'Crónica']
-                st.dataframe(tabla_top10, use_container_width=True, hide_index=True)
-
-                st.info("💡 **Leyenda:** ⚠️ = ENO | 💊 = Crónica")
-
-            with col2:
-                # Gráfico de barras
-                fig_top10 = create_bar_chart(
-                    top_10_unidad,
-                    x='Casos',
-                    y='CIE10',
-                    title=f'Top 10 - {unidad_seleccionada}',
-                    orientation='h'
+                # Marcar ENO y crónicas
+                top_n_filtrado['Es_ENO'] = top_n_filtrado['CIE10'].apply(
+                    lambda x: '⚠️' if x in df_eno['cie10'].values else ''
+                )
+                top_n_filtrado['Es_Cronica'] = top_n_filtrado['CIE10'].apply(
+                    lambda x: '💊' if x in df_cronicas['cie10'].values else ''
                 )
 
-                fig_top10.update_layout(
-                    yaxis={'categoryorder': 'total ascending'},
-                    height=400
-                )
+                # Tabla formateada
+                col1, col2 = st.columns([2, 1])
 
-                st.plotly_chart(fig_top10, use_container_width=True)
+                with col1:
+                    tabla_top_n = top_n_filtrado.copy()
+                    tabla_top_n['Casos'] = tabla_top_n['Casos'].apply(format_large_number)
+                    column_order = ['#', 'Diagnóstico', 'CIE10', 'Casos', '%', 'Es_ENO', 'Es_Cronica']
+                    tabla_top_n = tabla_top_n.rename(columns={'Rank':'#', 'Es_ENO': 'ENO', 'Es_Cronica': 'Crónica'})
+                    st.dataframe(tabla_top_n[column_order], use_container_width=True, hide_index=True)
+                    st.info("💡 **Leyenda:** ⚠️ = ENO | 💊 = Crónica")
+
+                with col2:
+                    # Gráfico de barras
+                    fig_top_n = create_bar_chart(
+                        top_n_filtrado,
+                        x='Casos',
+                        y='Diagnóstico',
+                        title=f'Top {len(top_n_filtrado)} - {unidad_seleccionada}',
+                        orientation='h'
+                    )
+                    fig_top_n.update_layout(
+                        yaxis={'categoryorder': 'total ascending'},
+                        height=max(400, len(top_n_filtrado) * 30)
+                    )
+                    st.plotly_chart(fig_top_n, use_container_width=True)
+            else:
+                st.warning("No hay diagnósticos seleccionados para mostrar.")
 
     st.markdown("---")
 

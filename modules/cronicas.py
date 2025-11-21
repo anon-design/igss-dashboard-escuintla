@@ -93,39 +93,65 @@ def render(df, df_cronicas):
 
     st.markdown("---")
 
-    # Top 20 crónicas
-    st.subheader("📊 Top 20 Enfermedades Crónicas")
+    # Top N crónicas
+    st.subheader("📊 Top N Enfermedades Crónicas")
 
-    top_cronicas = df_cronicas_data.groupby(['CIE10', 'nombre', 'categoria'])['Casos'].sum().reset_index()
-    top_cronicas = top_cronicas.sort_values('Casos', ascending=False).head(20)
-    top_cronicas['Rank'] = range(1, len(top_cronicas) + 1)
-    top_cronicas['Porcentaje'] = (top_cronicas['Casos'] / total_casos * 100).round(2)
+    # --- Filtros Dinámicos ---
+    with st.expander("⚙️ Opciones de Visualización"):
+        top_n_value = st.number_input(
+            "Selecciona el número de enfermedades a mostrar (N):",
+            min_value=5,
+            max_value=50,
+            value=20,
+            step=5,
+            key="top_n_cronicas"
+        )
 
-    # Tabla formateada
-    tabla_display = top_cronicas.copy()
-    tabla_display['Casos'] = tabla_display['Casos'].apply(format_large_number)
-    tabla_display = tabla_display[['Rank', 'CIE10', 'nombre', 'categoria', 'Casos', 'Porcentaje']]
-    tabla_display.columns = ['#', 'CIE-10', 'Enfermedad', 'Categoría', 'Casos', '%']
+    # Calcular todas las crónicas y luego filtrar
+    all_cronicas = df_cronicas_data.groupby(['CIE10', 'nombre', 'categoria'])['Casos'].sum().reset_index()
+    all_cronicas = all_cronicas.sort_values('Casos', ascending=False)
+    
+    with st.expander("Filtro de Exclusión de Enfermedades", expanded=False):
+        diagnosticos_disponibles = all_cronicas['nombre'].tolist()
+        diagnosticos_seleccionados = st.multiselect(
+            "Selecciona las enfermedades a incluir:",
+            options=diagnosticos_disponibles,
+            default=diagnosticos_disponibles,
+            key="exclude_filter_cronicas"
+        )
+    
+    # Aplicar filtros
+    top_cronicas_filtrado = all_cronicas[all_cronicas['nombre'].isin(diagnosticos_seleccionados)].head(top_n_value)
 
-    st.dataframe(tabla_display, use_container_width=True, hide_index=True)
+    if not top_cronicas_filtrado.empty:
+        top_cronicas_filtrado['Rank'] = range(1, len(top_cronicas_filtrado) + 1)
+        top_cronicas_filtrado['Porcentaje'] = (top_cronicas_filtrado['Casos'] / total_casos * 100).round(2)
 
-    # Gráfico de barras
-    st.subheader("📈 Visualización Top 20")
+        # Tabla formateada
+        tabla_display = top_cronicas_filtrado.copy()
+        tabla_display['Casos'] = tabla_display['Casos'].apply(format_large_number)
+        tabla_display = tabla_display[['Rank', 'CIE10', 'nombre', 'categoria', 'Casos', 'Porcentaje']]
+        tabla_display.columns = ['#', 'CIE-10', 'Enfermedad', 'Categoría', 'Casos', '%']
 
-    fig = create_bar_chart(
-        top_cronicas,
-        x='Casos',
-        y='CIE10',
-        title='Top 20 Enfermedades Crónicas',
-        orientation='h'
-    )
+        st.dataframe(tabla_display, use_container_width=True, hide_index=True)
 
-    fig.update_layout(
-        yaxis={'categoryorder': 'total ascending'},
-        height=700
-    )
+        # Gráfico de barras
+        st.subheader(f"📈 Visualización Top {len(top_cronicas_filtrado)}")
 
-    st.plotly_chart(fig, use_container_width=True)
+        fig = create_bar_chart(
+            top_cronicas_filtrado,
+            x='Casos',
+            y='nombre', # Usar nombre para el eje Y
+            title=f'Top {len(top_cronicas_filtrado)} Enfermedades Crónicas',
+            orientation='h'
+        )
+        fig.update_layout(
+            yaxis={'categoryorder': 'total ascending'},
+            height=max(400, len(top_cronicas_filtrado) * 35)
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning("No hay enfermedades seleccionadas para mostrar.")
 
     st.markdown("---")
 
