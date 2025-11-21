@@ -180,3 +180,45 @@ MESSAGES = {
     'no_data': 'No hay datos disponibles para los filtros seleccionados.',
     'error': 'Error al cargar los datos. Verifique la ubicación del archivo.',
 }
+
+# ============================================================
+# ESTILOS CSS
+# ============================================================
+
+CUSTOM_CSS = f"""
+    <style>
+    /* Adaptable a tema claro/oscuro */
+    h1 {{
+        color: {COLORS['primary']};
+        font-weight: 700;
+    }}
+    h2 {{
+        color: {COLORS['secondary']};
+        font-weight: 600;
+    }}
+    h3 {{
+        font-weight: 600;
+    }}
+    .stButton>button {{
+        background-color: {COLORS['primary']};
+        color: white !important;
+        border-radius: 5px;
+        border: none;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+    }}
+    .stButton>button:hover {{
+        background-color: {COLORS['secondary']};
+        opacity: 0.9;
+    }}
+    div[data-testid="stSidebarNav"] {{
+        background-color: {COLORS['primary']}15;
+    }}
+    /* Mejorar contraste en modo oscuro */
+    @media (prefers-color-scheme: dark) {{
+        h3 {{
+            color: #E0E0E0;
+        }}
+    }}
+    </style>
+"""

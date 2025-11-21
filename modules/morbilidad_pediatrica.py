@@ -15,7 +15,7 @@ from utils.filters import filter_by_age_group, get_top_n, aggregate_by_period
 from utils.colors import create_bar_chart, create_line_chart, create_metric_card_html, format_large_number
 
 
-def render(df, df_eno, df_cronicas, df_capitulos, df_diagnosticos):
+def render(df, df_eno, df_cronicas, df_diagnosticos):
     """
     Renderiza el módulo de morbilidad pediátrica
 
@@ -23,7 +23,6 @@ def render(df, df_eno, df_cronicas, df_capitulos, df_diagnosticos):
         df: DataFrame filtrado con datos
         df_eno: DataFrame con catálogo ENO
         df_cronicas: DataFrame con catálogo de crónicas
-        df_capitulos: DataFrame con catálogo de capítulos CIE-10
         df_diagnosticos: DataFrame con el catálogo completo de nombres de CIE-10
     """
     st.title("👶 Morbilidad Pediátrica")
