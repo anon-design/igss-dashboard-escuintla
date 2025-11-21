@@ -1,0 +1,116 @@
+cie10,nombre,categoria,notificacion
+A00,Cólera,Inmediata,Inmediata
+A01,Fiebre tifoidea y paratifoidea,Inmediata,Inmediata
+A02,Otras infecciones por Salmonella,Transmisión alimentaria,Semanal
+A03,Shigelosis,Transmisión alimentaria,Semanal
+A04,Otras infecciones intestinales bacterianas,Transmisión alimentaria,Semanal
+A05,Otras intoxicaciones alimentarias bacterianas,Transmisión alimentaria,Semanal
+A06,Amebiasis,Transmisión alimentaria,Semanal
+A15,Tuberculosis respiratoria confirmada bacteriológicamente,Inmediata,Inmediata
+A16,Tuberculosis respiratoria no confirmada,Inmediata,Inmediata
+A17,Tuberculosis del sistema nervioso,Inmediata,Inmediata
+A18,Tuberculosis de otros órganos,Inmediata,Inmediata
+A19,Tuberculosis miliar,Inmediata,Inmediata
+A20,Peste,Inmediata,Inmediata
+A21,Tularemia,Inmediata,Inmediata
+A22,Carbunco (ántrax),Inmediata,Inmediata
+A23,Brucelosis,Zoonótica,Semanal
+A24,Muermo y melioidosis,Inmediata,Inmediata
+A25,Fiebres por mordedura de rata,Zoonótica,Semanal
+A26,Erisipeloide,Zoonótica,Semanal
+A27,Leptospirosis,Zoonótica,Semanal
+A30,Lepra (enfermedad de Hansen),Inmediata,Inmediata
+A32,Listeriosis,Transmisión alimentaria,Semanal
+A33,Tétanos del recién nacido,Inmediata,Inmediata
+A34,Tétanos obstétrico,Inmediata,Inmediata
+A35,Otros tétanos,Inmediata,Inmediata
+A36,Difteria,Inmediata,Inmediata
+A37,Tos ferina (coqueluche),Inmunoprevenible,Semanal
+A38,Escarlatina,Transmisión respiratoria,Semanal
+A39,Infección meningocócica,Inmediata,Inmediata
+A40,Septicemia estreptocócica,Transmisión respiratoria,Semanal
+A41,Otras septicemias,Transmisión respiratoria,Semanal
+A42,Actinomicosis,Transmisión respiratoria,Semanal
+A46,Erisipela,Transmisión respiratoria,Semanal
+A48,Otras enfermedades bacterianas NCOP,Transmisión respiratoria,Semanal
+A50,Sífilis congénita,ITS,Semanal
+A51,Sífilis precoz,ITS,Semanal
+A52,Sífilis tardía,ITS,Semanal
+A53,Otras sífilis y las no especificadas,ITS,Semanal
+A54,Infección gonocócica,ITS,Semanal
+A56,Otras infecciones de transmisión sexual por clamidias,ITS,Semanal
+A60,Infección anogenital por virus del herpes,ITS,Semanal
+A63,Otras enfermedades de transmisión sexual,ITS,Semanal
+A75,Tifus,Vectorial,Semanal
+A77,Fiebre maculosa (rickettsiosis transmitida por garrapatas),Vectorial,Semanal
+A80,Poliomielitis aguda,Inmediata,Inmediata
+A81,Infecciones por virus atípicos del SNC,Inmediata,Inmediata
+A82,Rabia,Inmediata,Inmediata
+A83,Encefalitis viral transmitida por mosquitos,Vectorial,Inmediata
+A84,Encefalitis viral transmitida por garrapatas,Vectorial,Inmediata
+A85,Otras encefalitis virales,Vectorial,Semanal
+A86,Encefalitis viral no especificada,Vectorial,Semanal
+A87,Meningitis viral,Transmisión respiratoria,Semanal
+A90,Fiebre del dengue (dengue clásico),Vectorial,Inmediata
+A91,Fiebre del dengue hemorrágico,Vectorial,Inmediata
+A92,Otras fiebres virales transmitidas por mosquitos,Vectorial,Inmediata
+A920,Fiebre de chikungunya,Vectorial,Inmediata
+A923,Fiebre del Nilo Occidental,Vectorial,Inmediata
+A925,Fiebre de Zika,Vectorial,Inmediata
+A93,Otras fiebres virales transmitidas por artrópodos,Vectorial,Inmediata
+A95,Fiebre amarilla,Vectorial,Inmediata
+A96,Fiebre hemorrágica por arenavirus,Inmediata,Inmediata
+A98,Otras fiebres hemorrágicas virales,Inmediata,Inmediata
+B00,Infecciones por virus del herpes,Transmisión respiratoria,Semanal
+B01,Varicela,Inmunoprevenible,Semanal
+B02,Herpes zóster,Transmisión respiratoria,Semanal
+B03,Viruela,Inmediata,Inmediata
+B04,Viruela de los monos,Inmediata,Inmediata
+B05,Sarampión,Inmediata,Inmediata
+B06,Rubéola,Inmediata,Inmediata
+B15,Hepatitis A,Transmisión alimentaria,Semanal
+B16,Hepatitis B,ITS,Semanal
+B17,Otras hepatitis virales agudas,ITS,Semanal
+B18,Hepatitis viral crónica,ITS,Semanal
+B20,Enfermedad por VIH resultante en enfermedades infecciosas,ITS,Semanal
+B21,Enfermedad por VIH resultante en neoplasias,ITS,Semanal
+B22,Enfermedad por VIH resultante en otras enfermedades,ITS,Semanal
+B23,Enfermedad por VIH resultante en otras afecciones,ITS,Semanal
+B24,Enfermedad por VIH sin otra especificación,ITS,Semanal
+B26,Parotiditis infecciosa (paperas),Inmunoprevenible,Semanal
+B33,Otras enfermedades virales,Transmisión respiratoria,Semanal
+B34,Infección viral de sitio no especificado,Transmisión respiratoria,Semanal
+B50,Paludismo (malaria) por Plasmodium falciparum,Vectorial,Inmediata
+B51,Paludismo (malaria) por Plasmodium vivax,Vectorial,Inmediata
+B52,Paludismo (malaria) por Plasmodium malariae,Vectorial,Inmediata
+B53,Otro paludismo (malaria) confirmado parasitológicamente,Vectorial,Inmediata
+B54,Paludismo (malaria) no especificado,Vectorial,Inmediata
+B55,Leishmaniasis,Vectorial,Semanal
+B56,Tripanosomiasis africana,Vectorial,Inmediata
+B57,Enfermedad de Chagas (tripanosomiasis americana),Vectorial,Semanal
+B58,Toxoplasmosis,Zoonótica,Semanal
+B60,Otras enfermedades debidas a protozoarios,Zoonótica,Semanal
+B65,Esquistosomiasis,Parasitaria,Semanal
+B66,Otras infecciones por trematodos,Parasitaria,Semanal
+B67,Equinococosis,Zoonótica,Semanal
+B68,Teniasis,Parasitaria,Semanal
+B69,Cisticercosis,Parasitaria,Semanal
+B70,Difilobotriasis y esparganosis,Parasitaria,Semanal
+B71,Otras infecciones por cestodos,Parasitaria,Semanal
+B72,Dracontiasis,Parasitaria,Semanal
+B73,Oncocercosis,Vectorial,Semanal
+B74,Filariasis,Vectorial,Semanal
+B75,Triquinosis,Zoonótica,Semanal
+B76,Anquilostomiasis y necatoriasis,Parasitaria,Semanal
+B77,Ascariasis,Parasitaria,Semanal
+B78,Estrongiloidiasis,Parasitaria,Semanal
+J09,Influenza debida a virus identificado de influenza aviar,Inmediata,Inmediata
+J10,Influenza debida a otro virus de la influenza identificado,Inmunoprevenible,Semanal
+J11,Influenza debida a virus no identificado,Inmunoprevenible,Semanal
+P350,Síndrome de rubéola congénita,Inmediata,Inmediata
+P351,Infección congénita por citomegalovirus,Congénita,Semanal
+P352,Infección congénita por virus del herpes simple,Congénita,Semanal
+P353,Hepatitis viral congénita,Congénita,Semanal
+U04,Síndrome respiratorio agudo severo (SARS),Inmediata,Inmediata
+U071,COVID-19,Inmediata,Inmediata
+U072,COVID-19 sin identificación del virus,Inmediata,Inmediata

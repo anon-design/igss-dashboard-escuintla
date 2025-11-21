@@ -1,0 +1,22 @@
+capitulo,rango_inicio,rango_fin,nombre
+I,A00,B99,Enfermedades infecciosas y parasitarias
+II,C00,D48,Tumores (neoplasias)
+III,D50,D89,Enfermedades de la sangre y órganos hematopoyéticos
+IV,E00,E90,Enfermedades endocrinas nutricionales y metabólicas
+V,F00,F99,Trastornos mentales y del comportamiento
+VI,G00,G99,Enfermedades del sistema nervioso
+VII,H00,H59,Enfermedades del ojo y sus anexos
+VIII,H60,H95,Enfermedades del oído y de la apófisis mastoides
+IX,I00,I99,Enfermedades del sistema circulatorio
+X,J00,J99,Enfermedades del sistema respiratorio
+XI,K00,K93,Enfermedades del sistema digestivo
+XII,L00,L99,Enfermedades de la piel y del tejido subcutáneo
+XIII,M00,M99,Enfermedades del sistema osteomuscular y tejido conjuntivo
+XIV,N00,N99,Enfermedades del sistema genitourinario
+XV,O00,O99,Embarazo parto y puerperio
+XVI,P00,P96,Afecciones originadas en el período perinatal
+XVII,Q00,Q99,Malformaciones congénitas deformidades y anomalías cromosómicas
+XVIII,R00,R99,Síntomas signos y hallazgos clínicos y de laboratorio
+XIX,S00,T98,Traumatismos envenenamientos y otras consecuencias de causas externas
+XX,V01,Y98,Causas externas de morbilidad y mortalidad
+XXI,Z00,Z99,Factores que influyen en el estado de salud y contacto con servicios de salud

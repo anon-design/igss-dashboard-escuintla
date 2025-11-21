@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+
+# Streamlit
+.streamlit/
+
+# Virtual Environments
+venv/
+env/
+*.env
+
+# IDE
+.idea/
+.vscode/
+
+# Temporary analysis files
+analisis_fuente.py
+inspect_excel.py

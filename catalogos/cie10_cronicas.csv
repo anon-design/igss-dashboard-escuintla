@@ -1,0 +1,142 @@
+cie10,nombre,categoria,subcategoria
+E10,Diabetes mellitus tipo 1,Metabólicas,Diabetes
+E11,Diabetes mellitus tipo 2,Metabólicas,Diabetes
+E12,Diabetes mellitus relacionada con desnutrición,Metabólicas,Diabetes
+E13,Otras diabetes mellitus especificadas,Metabólicas,Diabetes
+E14,Diabetes mellitus no especificada,Metabólicas,Diabetes
+E66,Obesidad,Metabólicas,Obesidad
+E660,Obesidad debida a exceso de calorías,Metabólicas,Obesidad
+E661,Obesidad inducida por drogas,Metabólicas,Obesidad
+E662,Obesidad extrema con hipoventilación alveolar,Metabólicas,Obesidad
+E668,Otras obesidades,Metabólicas,Obesidad
+E669,Obesidad no especificada,Metabólicas,Obesidad
+E78,Trastornos del metabolismo de las lipoproteínas,Metabólicas,Dislipidemia
+E780,Hipercolesterolemia pura,Metabólicas,Dislipidemia
+E781,Hipergliceridemia pura,Metabólicas,Dislipidemia
+E782,Hiperlipidemia mixta,Metabólicas,Dislipidemia
+E783,Hipercolesterolemia familiar,Metabólicas,Dislipidemia
+E784,Otras hiperlipidemias,Metabólicas,Dislipidemia
+E785,Hiperlipidemia no especificada,Metabólicas,Dislipidemia
+E790,Hiperuricemia sin signos de artritis inflamatoria,Metabólicas,Gota
+E791,Hiperuricemia,Metabólicas,Gota
+I10,Hipertensión esencial (primaria),Cardiovasculares,Hipertensión
+I11,Enfermedad cardíaca hipertensiva,Cardiovasculares,Hipertensión
+I110,Enfermedad cardíaca hipertensiva con insuficiencia cardíaca,Cardiovasculares,Hipertensión
+I119,Enfermedad cardíaca hipertensiva sin insuficiencia cardíaca,Cardiovasculares,Hipertensión
+I12,Enfermedad renal hipertensiva,Cardiovasculares,Hipertensión
+I120,Enfermedad renal hipertensiva con insuficiencia renal,Cardiovasculares,Hipertensión
+I129,Enfermedad renal hipertensiva sin insuficiencia renal,Cardiovasculares,Hipertensión
+I13,Enfermedad cardíaca y renal hipertensiva,Cardiovasculares,Hipertensión
+I15,Hipertensión secundaria,Cardiovasculares,Hipertensión
+I20,Angina de pecho,Cardiovasculares,Cardiopatía isquémica
+I21,Infarto agudo del miocardio,Cardiovasculares,Cardiopatía isquémica
+I22,Infarto del miocardio subsecuente,Cardiovasculares,Cardiopatía isquémica
+I23,Complicaciones posteriores a infarto agudo del miocardio,Cardiovasculares,Cardiopatía isquémica
+I24,Otras enfermedades isquémicas agudas del corazón,Cardiovasculares,Cardiopatía isquémica
+I25,Enfermedad isquémica crónica del corazón,Cardiovasculares,Cardiopatía isquémica
+I42,Cardiomiopatías,Cardiovasculares,Miocardiopatía
+I420,Cardiomiopatía dilatada,Cardiovasculares,Miocardiopatía
+I421,Cardiomiopatía hipertrófica obstructiva,Cardiovasculares,Miocardiopatía
+I50,Insuficiencia cardíaca,Cardiovasculares,Insuficiencia cardíaca
+I500,Insuficiencia cardíaca congestiva,Cardiovasculares,Insuficiencia cardíaca
+I501,Insuficiencia ventricular izquierda,Cardiovasculares,Insuficiencia cardíaca
+I509,Insuficiencia cardíaca no especificada,Cardiovasculares,Insuficiencia cardíaca
+I63,Infarto cerebral,Cardiovasculares,Enfermedad cerebrovascular
+I64,Accidente vascular encefálico agudo no especificado,Cardiovasculares,Enfermedad cerebrovascular
+I65,Oclusión y estenosis de arterias precerebrales,Cardiovasculares,Enfermedad cerebrovascular
+I66,Oclusión y estenosis de arterias cerebrales,Cardiovasculares,Enfermedad cerebrovascular
+I67,Otras enfermedades cerebrovasculares,Cardiovasculares,Enfermedad cerebrovascular
+I69,Secuelas de enfermedad cerebrovascular,Cardiovasculares,Enfermedad cerebrovascular
+I70,Aterosclerosis,Cardiovasculares,Arteriopatía periférica
+I73,Otras enfermedades vasculares periféricas,Cardiovasculares,Arteriopatía periférica
+I74,Embolia y trombosis arteriales,Cardiovasculares,Arteriopatía periférica
+J40,Bronquitis no especificada como aguda o crónica,Respiratorias,EPOC
+J41,Bronquitis crónica simple y mucopurulenta,Respiratorias,EPOC
+J42,Bronquitis crónica no especificada,Respiratorias,EPOC
+J43,Enfisema,Respiratorias,EPOC
+J44,Otras enfermedades pulmonares obstructivas crónicas,Respiratorias,EPOC
+J45,Asma,Respiratorias,Asma
+J450,Asma predominantemente alérgica,Respiratorias,Asma
+J451,Asma no alérgica,Respiratorias,Asma
+J458,Asma mixta,Respiratorias,Asma
+J459,Asma no especificada,Respiratorias,Asma
+J46,Estado asmático,Respiratorias,Asma
+J47,Bronquiectasia,Respiratorias,Bronquiectasia
+K25,Úlcera gástrica,Digestivas,Enfermedad ácido-péptica
+K26,Úlcera duodenal,Digestivas,Enfermedad ácido-péptica
+K27,Úlcera péptica de sitio no especificado,Digestivas,Enfermedad ácido-péptica
+K28,Úlcera gastroyeyunal,Digestivas,Enfermedad ácido-péptica
+K29,Gastritis y duodenitis,Digestivas,Gastritis crónica
+K297,Gastritis no especificada,Digestivas,Gastritis crónica
+K70,Enfermedad alcohólica del hígado,Digestivas,Enfermedad hepática crónica
+K73,Hepatitis crónica no clasificada en otra parte,Digestivas,Enfermedad hepática crónica
+K74,Fibrosis y cirrosis del hígado,Digestivas,Enfermedad hepática crónica
+K76,Otras enfermedades del hígado,Digestivas,Enfermedad hepática crónica
+K80,Colelitiasis,Digestivas,Enfermedad biliar crónica
+K81,Colecistitis,Digestivas,Enfermedad biliar crónica
+K82,Otras enfermedades de la vesícula biliar,Digestivas,Enfermedad biliar crónica
+N18,Enfermedad renal crónica,Renales,Enfermedad renal crónica
+N180,Enfermedad renal crónica estadio 1,Renales,Enfermedad renal crónica
+N181,Enfermedad renal crónica estadio 2,Renales,Enfermedad renal crónica
+N182,Enfermedad renal crónica estadio 3,Renales,Enfermedad renal crónica
+N183,Enfermedad renal crónica estadio 4,Renales,Enfermedad renal crónica
+N184,Enfermedad renal crónica estadio 5,Renales,Enfermedad renal crónica
+N185,Enfermedad renal crónica no especificada,Renales,Enfermedad renal crónica
+N19,Insuficiencia renal no especificada,Renales,Insuficiencia renal
+M05,Artritis reumatoide seropositiva,Reumatológicas,Artritis reumatoide
+M06,Otras artritis reumatoides,Reumatológicas,Artritis reumatoide
+M10,Gota,Reumatológicas,Gota
+M15,Poliartrosis,Reumatológicas,Osteoartritis
+M16,Coxartrosis (artrosis de la cadera),Reumatológicas,Osteoartritis
+M17,Gonartrosis (artrosis de la rodilla),Reumatológicas,Osteoartritis
+M19,Otras artrosis,Reumatológicas,Osteoartritis
+M32,Lupus eritematoso sistémico,Reumatológicas,Lupus
+M45,Espondilitis anquilosante,Reumatológicas,Espondiloartritis
+M79,Otros trastornos de los tejidos blandos,Reumatológicas,Fibromialgia
+M791,Mialgia,Reumatológicas,Fibromialgia
+M797,Fibromialgia,Reumatológicas,Fibromialgia
+G20,Enfermedad de Parkinson,Neurológicas,Parkinson
+G21,Parkinsonismo secundario,Neurológicas,Parkinson
+G30,Enfermedad de Alzheimer,Neurológicas,Demencia
+G31,Otras enfermedades degenerativas del sistema nervioso,Neurológicas,Demencia
+G35,Esclerosis múltiple,Neurológicas,Esclerosis múltiple
+G40,Epilepsia,Neurológicas,Epilepsia
+G41,Estado epiléptico,Neurológicas,Epilepsia
+G43,Migraña,Neurológicas,Cefalea
+G44,Otros síndromes de cefalea,Neurológicas,Cefalea
+F20,Esquizofrenia,Psiquiátricas,Esquizofrenia
+F31,Trastorno afectivo bipolar,Psiquiátricas,Trastorno bipolar
+F32,Episodio depresivo,Psiquiátricas,Depresión
+F33,Trastorno depresivo recurrente,Psiquiátricas,Depresión
+F41,Otros trastornos de ansiedad,Psiquiátricas,Ansiedad
+F410,Trastorno de pánico,Psiquiátricas,Ansiedad
+F411,Trastorno de ansiedad generalizada,Psiquiátricas,Ansiedad
+C00-C97,Tumores malignos,Oncológicas,Cáncer
+C18,Tumor maligno del colon,Oncológicas,Cáncer colorrectal
+C19,Tumor maligno de la unión rectosigmoidea,Oncológicas,Cáncer colorrectal
+C20,Tumor maligno del recto,Oncológicas,Cáncer colorrectal
+C34,Tumor maligno de los bronquios y del pulmón,Oncológicas,Cáncer de pulmón
+C50,Tumor maligno de la mama,Oncológicas,Cáncer de mama
+C53,Tumor maligno del cuello del útero,Oncológicas,Cáncer cervicouterino
+C54,Tumor maligno del cuerpo del útero,Oncológicas,Cáncer de útero
+C56,Tumor maligno del ovario,Oncológicas,Cáncer de ovario
+C61,Tumor maligno de la próstata,Oncológicas,Cáncer de próstata
+C64,Tumor maligno del riñón,Oncológicas,Cáncer renal
+C67,Tumor maligno de la vejiga urinaria,Oncológicas,Cáncer de vejiga
+C73,Tumor maligno de la glándula tiroides,Oncológicas,Cáncer de tiroides
+C81,Enfermedad de Hodgkin,Oncológicas,Linfoma
+C82,Linfoma no Hodgkin folicular,Oncológicas,Linfoma
+C83,Linfoma no Hodgkin difuso,Oncológicas,Linfoma
+C90,Mieloma múltiple,Oncológicas,Mieloma
+C91,Leucemia linfoide,Oncológicas,Leucemia
+C92,Leucemia mieloide,Oncológicas,Leucemia
+D50,Anemia por déficit de hierro,Hematológicas,Anemia crónica
+D51,Anemia por déficit de vitamina B12,Hematológicas,Anemia crónica
+D52,Anemia por déficit de folato,Hematológicas,Anemia crónica
+D53,Otras anemias nutricionales,Hematológicas,Anemia crónica
+D55,Anemia debida a trastornos enzimáticos,Hematológicas,Anemia crónica
+D56,Talasemia,Hematológicas,Hemoglobinopatía
+D57,Trastornos falciformes,Hematológicas,Hemoglobinopatía
+D58,Otras anemias hemolíticas hereditarias,Hematológicas,Anemia hemolítica
+D59,Anemia hemolítica adquirida,Hematológicas,Anemia hemolítica
+D61,Otras anemias aplásicas,Hematológicas,Anemia aplásica
