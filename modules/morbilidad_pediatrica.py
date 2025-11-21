@@ -178,12 +178,12 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
         top_codes_temporal = top_n_filtrado.head(num_top_temporal)['CIE10'].tolist()
         df_top_temporal = df_pediatrico[df_pediatrico['CIE10'].isin(top_codes_temporal)]
 
-        # Agrupar por año y código
-        tendencia = df_top_temporal.groupby(['Año', 'CIE10'])['Casos'].sum().reset_index()
-        
-        # Unir nombres para la leyenda del gráfico
-        tendencia = pd.merge(tendencia, top_n_filtrado[['CIE10', 'Diagnóstico']], on='CIE10', how='left')
+        # Unir nombres para la leyenda del gráfico y para los groupbys posteriores
+        df_top_temporal = pd.merge(df_top_temporal, top_n_filtrado[['CIE10', 'Diagnóstico']], on='CIE10', how='left')
 
+        # Agrupar por año y código
+        tendencia = df_top_temporal.groupby(['Año', 'Diagnóstico'])['Casos'].sum().reset_index()
+        
         if not tendencia.empty:
             fig_lineas = create_line_chart(
                 tendencia,
