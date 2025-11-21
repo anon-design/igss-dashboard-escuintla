@@ -14,6 +14,7 @@ sys.path.append(str(Path(__file__).parent))
 from config import PAGE_CONFIG, CUSTOM_CSS
 from utils.data_loader import load_all_data
 from utils.filters import apply_filters_jerarquicos, get_summary_stats
+from utils.auth import check_password, render_logout_button
 
 # --- Importar Módulos de UI ---
 from ui.sidebar import render_sidebar, render_summary_stats
@@ -43,6 +44,11 @@ def main():
     """
     Función principal que orquesta la aplicación Streamlit.
     """
+    # --- 0. AUTENTICACIÓN ---
+    # Verificar login antes de mostrar el dashboard
+    if not check_password():
+        st.stop()  # Detener ejecución si no está autenticado
+
     # --- 1. Manejo de Carga de Datos y Session State ---
     # Inicializar st.session_state['datos'] si no existe.
     if 'datos' not in st.session_state:
@@ -85,6 +91,9 @@ def main():
     # Obtener estadísticas de los datos filtrados y mostrarlas en la sidebar.
     stats = get_summary_stats(df_filtrado)
     render_summary_stats(stats, filtros["total_general"], filtros["filtro_unidad"])
+
+    # Botón de cerrar sesión en el sidebar
+    render_logout_button()
 
     # --- 3. Enrutador de Páginas ---
     # Un diccionario mapea la selección del usuario a la función de renderizado correspondiente.
