@@ -10,7 +10,7 @@ import sys
 # Agregar el directorio padre al path para imports
 sys.path.append(str(Path(__file__).parent.parent))
 
-from config import DATA_FILE, CATALOGOS_DIR
+from config import DATA_FILE, CATALOGOS_DIR, PROCEDENCIA_FILE
 
 
 def load_all_data(uploaded_file=None):
@@ -383,5 +383,110 @@ def load_diagnosticos_nombres():
     df_combined['cie10'] = df_combined['cie10'].astype(str).str.replace(r'[^A-Z0-9]', '', regex=True).str.upper()
     df_combined = df_combined[~df_combined['cie10'].str.contains('-')]
     df_combined.drop_duplicates(subset=['cie10'], keep='first', inplace=True)
-    
+
     return df_combined
+
+
+@st.cache_data(ttl=3600)
+def load_procedencia_data():
+    """
+    Carga los datos de procedencia geográfica.
+    Estructura: CIE10 × Unidad × Año × Departamento × Municipio × Sexo × Edad → Casos
+
+    Returns:
+        pd.DataFrame: DataFrame con datos de procedencia geográfica
+    """
+    try:
+        if not PROCEDENCIA_FILE.exists():
+            st.error(f"No se encontró el archivo de procedencia: {PROCEDENCIA_FILE}")
+            return None
+
+        df = pd.read_csv(PROCEDENCIA_FILE, encoding='utf-8-sig')
+
+        # Verificar columnas requeridas
+        required_cols = ['CIE10', 'Unidad', 'Año', 'Departamento', 'Municipio', 'Sexo', 'Edad', 'Casos']
+        if not all(col in df.columns for col in required_cols):
+            missing_cols = [col for col in required_cols if col not in df.columns]
+            st.error(f"Faltan columnas requeridas en el archivo de procedencia: {', '.join(missing_cols)}")
+            return None
+
+        # Convertir Año a int
+        df['Año'] = pd.to_numeric(df['Año'], errors='coerce').astype('Int64')
+
+        # Convertir Casos a int
+        df['Casos'] = pd.to_numeric(df['Casos'], errors='coerce').fillna(0).astype(int)
+
+        # Estandarizar columnas de texto
+        for col in ['Departamento', 'Municipio', 'Sexo']:
+            df[col] = df[col].str.strip().str.upper()
+
+        # Limpiar código CIE10
+        df['CIE10'] = df['CIE10'].astype(str).str.replace(r'[^A-Z0-9]', '', regex=True).str.upper()
+
+        return df
+
+    except FileNotFoundError:
+        st.error(f"No se encontró el archivo de procedencia: {PROCEDENCIA_FILE}")
+        return None
+    except Exception as e:
+        st.error(f"Error al cargar datos de procedencia: {str(e)}")
+        return None
+
+
+def get_procedencia_stats(df):
+    """
+    Retorna estadísticas básicas del dataset de procedencia.
+
+    IMPORTANTE: Respeta la estructura jerárquica de los datos:
+    - "General Escuintla Procedencia" = TOTAL COMPLETO (100% de casos)
+    - Unidades específicas = SUBCONJUNTOS de General (NO sumar)
+    - "Otros" = General - Suma(Específicas)
+
+    Args:
+        df (pd.DataFrame): DataFrame con datos de procedencia
+
+    Returns:
+        dict: Diccionario con estadísticas del dataset de procedencia
+    """
+    if df is None or df.empty:
+        return {
+            'total_registros': 0,
+            'total_casos': 0,
+            'total_casos_general': 0,
+            'casos_especificas': 0,
+            'casos_otros': 0,
+            'años': [],
+            'departamentos': 0,
+            'municipios': 0,
+            'unidades': 0,
+            'codigos_cie10': 0
+        }
+
+    # Separar General de unidades específicas (estructura jerárquica)
+    UNIDAD_GENERAL = 'General Escuintla Procedencia'
+    df_general = df[df['Unidad'] == UNIDAD_GENERAL]
+    df_especificas = df[df['Unidad'] != UNIDAD_GENERAL]
+
+    # TOTAL REAL = solo General Escuintla Procedencia
+    total_general = int(df_general['Casos'].sum())
+    casos_especificas = int(df_especificas['Casos'].sum())
+    casos_otros = total_general - casos_especificas  # No clasificados en unidades específicas
+
+    return {
+        'total_registros': len(df),
+        'total_casos': total_general,  # CORRECTO: Solo General (no suma de todas)
+        'total_casos_general': total_general,
+        'casos_especificas': casos_especificas,
+        'casos_otros': casos_otros,
+        'pct_especificas': round(casos_especificas / total_general * 100, 2) if total_general > 0 else 0,
+        'pct_otros': round(casos_otros / total_general * 100, 2) if total_general > 0 else 0,
+        'años': sorted(df['Año'].dropna().unique().tolist()),
+        'departamentos': df['Departamento'].nunique(),
+        'municipios': df['Municipio'].nunique(),
+        'unidades': df['Unidad'].nunique(),
+        'codigos_cie10': df['CIE10'].nunique(),
+        'año_min': int(df['Año'].min()) if not df['Año'].isna().all() else None,
+        'año_max': int(df['Año'].max()) if not df['Año'].isna().all() else None,
+        # Casos por año - SOLO de General para evitar duplicación
+        'casos_por_año': df_general.groupby('Año')['Casos'].sum().to_dict() if not df_general['Año'].isna().all() else {}
+    }

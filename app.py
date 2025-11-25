@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent))
 
 from config import PAGE_CONFIG, CUSTOM_CSS
-from utils.data_loader import load_all_data
+from utils.data_loader import load_all_data, load_procedencia_data
 from utils.filters import apply_filters_jerarquicos, get_summary_stats
 from utils.auth import check_password, render_logout_button
 
@@ -22,6 +22,14 @@ from ui.main_page import render_main_page
 
 # --- Importar Módulos de Páginas de Análisis ---
 from modules import morbilidad_adultos, morbilidad_pediatrica, capitulos, eno, cronicas, geografico
+from modules import procedencia_general
+from modules.procedencia import (
+    morbilidad_adultos as proc_adultos,
+    morbilidad_pediatrica as proc_pediatrica,
+    capitulos as proc_capitulos,
+    eno as proc_eno,
+    cronicas as proc_cronicas
+)
 
 # --- Configuración de la Página ---
 st.set_page_config(**PAGE_CONFIG)
@@ -95,17 +103,32 @@ def main():
     # Botón de cerrar sesión en el sidebar
     render_logout_button()
 
-    # --- 3. Enrutador de Páginas ---
+    # --- 3. Cargar datos de procedencia (lazy loading) ---
+    # Solo se carga cuando se accede a la página de procedencia
+    df_procedencia = None
+    if filtros["selected_page"].startswith("procedencia"):
+        df_procedencia = load_procedencia_data()
+
+    # --- 4. Enrutador de Páginas ---
     # Un diccionario mapea la selección del usuario a la función de renderizado correspondiente.
     # A cada función se le pasan los dataframes que necesita.
     page_router = {
+        # Módulos originales (datos de atención)
         "inicio": lambda: render_main_page(df_filtrado, df_completo, stats),
         "adultos": lambda: morbilidad_adultos.render(df_filtrado, datos['eno'], datos['cronicas'], datos['diagnosticos']),
         "pediatrica": lambda: morbilidad_pediatrica.render(df_filtrado, datos['eno'], datos['cronicas'], datos['diagnosticos']),
         "capitulos": lambda: capitulos.render(df_filtrado, datos['capitulos']),
         "eno": lambda: eno.render(df_filtrado, datos['eno']),
         "cronicas": lambda: cronicas.render(df_filtrado, datos['cronicas']),
-        "geografico": lambda: geografico.render(df_filtrado, datos['eno'], datos['cronicas'], datos['diagnosticos'])
+        "geografico": lambda: geografico.render(df_filtrado, datos['eno'], datos['cronicas'], datos['diagnosticos']),
+        "separator": lambda: st.info("Seleccione un módulo de análisis"),
+        # Módulos de PROCEDENCIA (datos geográficos)
+        "procedencia_general": lambda: procedencia_general.render(df_procedencia),
+        "procedencia_adultos": lambda: proc_adultos.render(df_procedencia, datos['eno'], datos['cronicas'], datos['diagnosticos']),
+        "procedencia_pediatrica": lambda: proc_pediatrica.render(df_procedencia, datos['eno'], datos['cronicas'], datos['diagnosticos']),
+        "procedencia_capitulos": lambda: proc_capitulos.render(df_procedencia, datos['capitulos']),
+        "procedencia_eno": lambda: proc_eno.render(df_procedencia, datos['eno']),
+        "procedencia_cronicas": lambda: proc_cronicas.render(df_procedencia, datos['cronicas'])
     }
     
     # Ejecutar la función de renderizado de la página seleccionada.
@@ -115,7 +138,7 @@ def main():
     else:
         st.error("Página no encontrada.")
 
-    # --- 4. Footer ---
+    # --- 5. Footer ---
     st.markdown("---")
     st.markdown(
         """

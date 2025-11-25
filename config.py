@@ -20,6 +20,10 @@ CATALOGOS_DIR = BASE_DIR / "catalogos"
 DATA_FILE = DATA_DIR / "Rangos_SIN_PROCEDENCIA.csv"
 DATA_PATH = str(DATA_FILE)  # Alias como string para compatibilidad
 
+# Archivo de datos de PROCEDENCIA (nuevo)
+# Ubicado en bases_limpias (nivel superior)
+PROCEDENCIA_FILE = BASE_DIR.parent / "bases_limpias" / "Procedencia_CONSOLIDADA.csv"
+
 # Asegurar que los directorios existen
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -123,6 +127,17 @@ UNIDADES = [
     "Consultorio Siquinala",
 ]
 
+# Unidades de datos de PROCEDENCIA
+UNIDADES_PROCEDENCIA = [
+    "General Escuintla Procedencia",
+    "Consultorio Masagua Procedencia",
+    "Consultorio la Democracia Procedencia",
+    "Consultorio La Gomera Procedencia",
+    "Consultorio Siquinala Procedencia",
+    "Hospital Escuintla Procedencia",
+    "Consultorio Palín Procedencia"
+]
+
 # Rangos de edad disponibles
 RANGOS_EDAD = [
     "0-15",
@@ -143,6 +158,28 @@ AÑOS = list(range(2018, 2026))  # 2018-2025
 
 # Sexos
 SEXOS = ["FEMENINO", "MASCULINO", "NO ESPECIFICADO"]
+
+# Departamentos de Guatemala (22 departamentos)
+DEPARTAMENTOS_GUATEMALA = [
+    "ALTA VERAPAZ", "BAJA VERAPAZ", "CHIMALTENANGO", "CHIQUIMULA",
+    "ESCUINTLA", "GUATEMALA", "HUEHUETENANGO", "IZABAL",
+    "JALAPA", "JUTIAPA", "PETÉN", "QUETZALTENANGO",
+    "QUICHÉ", "RETALHULEU", "SACATEPÉQUEZ", "SAN MARCOS",
+    "SANTA ROSA", "SOLOLÁ", "SUCHITEPÉQUEZ", "TOTONICAPÁN",
+    "ZACAPA", "EL PROGRESO"
+]
+
+# Mapeo de columnas para datos de PROCEDENCIA
+COLUMNAS_PROCEDENCIA = {
+    'codigo': 'CIE10',
+    'unidad': 'Unidad',
+    'anio': 'Año',
+    'departamento': 'Departamento',
+    'municipio': 'Municipio',
+    'sexo': 'Sexo',
+    'edad': 'Edad',
+    'casos': 'Casos'
+}
 
 # ============================================================
 # CONFIGURACIÓN DE REPORTES

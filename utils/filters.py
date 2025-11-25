@@ -428,3 +428,211 @@ def validar_seleccion_unidades(unidades_seleccionadas):
         return False, "⚠️ No se puede seleccionar 'General Escuintla' junto con otras unidades. 'General Escuintla' ya contiene todos los casos."
 
     return True, None
+
+
+# =============================================================================
+# FUNCIONES PARA DATOS DE PROCEDENCIA
+# =============================================================================
+
+UNIDAD_GENERAL_PROCEDENCIA = 'General Escuintla Procedencia'
+
+def get_total_general_procedencia(df):
+    """
+    Obtiene el total de casos de 'General Escuintla Procedencia' (100% de casos).
+
+    Args:
+        df (pd.DataFrame): DataFrame con datos de procedencia
+
+    Returns:
+        int: Total de casos (solo de General, sin duplicación)
+    """
+    if df is None or df.empty:
+        return 0
+
+    df_general = df[df['Unidad'] == UNIDAD_GENERAL_PROCEDENCIA]
+    return int(df_general['Casos'].sum())
+
+
+def get_unidades_especificas_procedencia(df):
+    """
+    Obtiene la lista de unidades específicas de procedencia (excluyendo General).
+
+    Args:
+        df (pd.DataFrame): DataFrame con datos de procedencia
+
+    Returns:
+        list: Lista de nombres de unidades específicas
+    """
+    if df is None or df.empty:
+        return []
+
+    unidades = df['Unidad'].unique().tolist()
+    return [u for u in unidades if u != UNIDAD_GENERAL_PROCEDENCIA]
+
+
+def calcular_casos_otros_procedencia(df):
+    """
+    Calcula los casos "Otros" (casos en General que no están en unidades específicas).
+
+    Args:
+        df (pd.DataFrame): DataFrame con datos de procedencia
+
+    Returns:
+        int: Casos en "Otros"
+    """
+    if df is None or df.empty:
+        return 0
+
+    total_general = get_total_general_procedencia(df)
+    df_especificas = df[df['Unidad'] != UNIDAD_GENERAL_PROCEDENCIA]
+    total_especificas = int(df_especificas['Casos'].sum())
+
+    return total_general - total_especificas
+
+
+def apply_filters_procedencia(df, unidades=None, anios=None, departamentos=None,
+                               municipios=None, sexos=None, edades=None):
+    """
+    Aplica filtros a los datos de procedencia respetando la estructura jerárquica.
+
+    IMPORTANTE: Si no se selecciona ninguna unidad, usa solo 'General Escuintla Procedencia'
+    para evitar duplicación de casos.
+
+    Args:
+        df (pd.DataFrame): DataFrame con datos de procedencia
+        unidades (list): Lista de unidades a filtrar (None = General)
+        anios (list): Lista de años a filtrar
+        departamentos (list): Lista de departamentos a filtrar
+        municipios (list): Lista de municipios a filtrar
+        sexos (list): Lista de sexos a filtrar
+        edades (list): Lista de rangos de edad a filtrar
+
+    Returns:
+        pd.DataFrame: DataFrame filtrado
+    """
+    if df is None or df.empty:
+        return df
+
+    df_filtrado = df.copy()
+
+    # Si no se especifican unidades, usar solo General para evitar duplicación
+    if not unidades or len(unidades) == 0:
+        df_filtrado = df_filtrado[df_filtrado['Unidad'] == UNIDAD_GENERAL_PROCEDENCIA]
+    else:
+        df_filtrado = df_filtrado[df_filtrado['Unidad'].isin(unidades)]
+
+    # Aplicar otros filtros
+    if anios and len(anios) > 0:
+        df_filtrado = df_filtrado[df_filtrado['Año'].isin(anios)]
+
+    if departamentos and len(departamentos) > 0:
+        df_filtrado = df_filtrado[df_filtrado['Departamento'].isin(departamentos)]
+
+    if municipios and len(municipios) > 0:
+        df_filtrado = df_filtrado[df_filtrado['Municipio'].isin(municipios)]
+
+    if sexos and len(sexos) > 0:
+        df_filtrado = df_filtrado[df_filtrado['Sexo'].isin(sexos)]
+
+    if edades and len(edades) > 0:
+        df_filtrado = df_filtrado[df_filtrado['Edad'].isin(edades)]
+
+    return df_filtrado
+
+
+def get_distribucion_departamentos(df):
+    """
+    Obtiene la distribución de casos por departamento.
+    Solo usa datos de 'General Escuintla Procedencia' para evitar duplicación.
+
+    Args:
+        df (pd.DataFrame): DataFrame con datos de procedencia
+
+    Returns:
+        pd.DataFrame: DataFrame con Departamento, Casos, Porcentaje
+    """
+    if df is None or df.empty:
+        return pd.DataFrame(columns=['Departamento', 'Casos', 'Porcentaje'])
+
+    # Solo usar General para evitar duplicación
+    df_general = df[df['Unidad'] == UNIDAD_GENERAL_PROCEDENCIA]
+    total_general = int(df_general['Casos'].sum())
+
+    if total_general == 0:
+        return pd.DataFrame(columns=['Departamento', 'Casos', 'Porcentaje'])
+
+    # Agrupar por departamento
+    df_dist = df_general.groupby('Departamento', as_index=False)['Casos'].sum()
+    df_dist['Porcentaje'] = (df_dist['Casos'] / total_general * 100).round(2)
+    df_dist = df_dist.sort_values('Casos', ascending=False)
+
+    return df_dist
+
+
+def get_distribucion_municipios(df, top_n=20):
+    """
+    Obtiene la distribución de casos por municipio.
+    Solo usa datos de 'General Escuintla Procedencia' para evitar duplicación.
+
+    Args:
+        df (pd.DataFrame): DataFrame con datos de procedencia
+        top_n (int): Número de municipios top a retornar
+
+    Returns:
+        pd.DataFrame: DataFrame con Municipio, Departamento, Casos, Porcentaje
+    """
+    if df is None or df.empty:
+        return pd.DataFrame(columns=['Municipio', 'Departamento', 'Casos', 'Porcentaje'])
+
+    # Solo usar General para evitar duplicación
+    df_general = df[df['Unidad'] == UNIDAD_GENERAL_PROCEDENCIA]
+    total_general = int(df_general['Casos'].sum())
+
+    if total_general == 0:
+        return pd.DataFrame(columns=['Municipio', 'Departamento', 'Casos', 'Porcentaje'])
+
+    # Agrupar por municipio (incluir departamento para referencia)
+    df_dist = df_general.groupby(['Municipio', 'Departamento'], as_index=False)['Casos'].sum()
+    df_dist['Porcentaje'] = (df_dist['Casos'] / total_general * 100).round(2)
+    df_dist = df_dist.sort_values('Casos', ascending=False).head(top_n)
+
+    return df_dist
+
+
+def get_distribucion_unidades_procedencia(df):
+    """
+    Obtiene la distribución de casos por unidad de procedencia.
+
+    IMPORTANTE: El total es 'General Escuintla Procedencia'.
+    Las unidades específicas son subconjuntos.
+    'Otros' = General - Suma(Específicas)
+
+    Args:
+        df (pd.DataFrame): DataFrame con datos de procedencia
+
+    Returns:
+        pd.DataFrame: DataFrame con Unidad, Casos, Porcentaje
+    """
+    if df is None or df.empty:
+        return pd.DataFrame(columns=['Unidad', 'Casos', 'Porcentaje'])
+
+    total_general = get_total_general_procedencia(df)
+
+    if total_general == 0:
+        return pd.DataFrame(columns=['Unidad', 'Casos', 'Porcentaje'])
+
+    # Obtener unidades específicas
+    df_especificas = df[df['Unidad'] != UNIDAD_GENERAL_PROCEDENCIA]
+    df_dist = df_especificas.groupby('Unidad', as_index=False)['Casos'].sum()
+
+    # Agregar "Otros"
+    casos_otros = calcular_casos_otros_procedencia(df)
+    if casos_otros > 0:
+        df_otros = pd.DataFrame([{'Unidad': 'Otros (no clasificados)', 'Casos': casos_otros}])
+        df_dist = pd.concat([df_dist, df_otros], ignore_index=True)
+
+    # Calcular porcentaje respecto al total general
+    df_dist['Porcentaje'] = (df_dist['Casos'] / total_general * 100).round(2)
+    df_dist = df_dist.sort_values('Casos', ascending=False)
+
+    return df_dist

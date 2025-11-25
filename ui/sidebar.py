@@ -31,7 +31,14 @@ def render_sidebar(df):
         "📚 Análisis por Capítulos CIE-10": "capitulos",
         "⚠️ Enfermedades de Notificación Obligatoria": "eno",
         "💊 Enfermedades Crónicas": "cronicas",
-        "🗺️ Análisis Geográfico": "geografico"
+        "🗺️ Análisis Geográfico": "geografico",
+        "─────────────────": "separator",  # Separador visual
+        "🌍 Procedencia: General": "procedencia_general",
+        "👨🌍 Procedencia: Adultos": "procedencia_adultos",
+        "👶🌍 Procedencia: Pediátrica": "procedencia_pediatrica",
+        "📚🌍 Procedencia: Capítulos": "procedencia_capitulos",
+        "⚠️🌍 Procedencia: ENO": "procedencia_eno",
+        "💊🌍 Procedencia: Crónicas": "procedencia_cronicas"
     }
 
     selected_page = st.sidebar.radio(
