@@ -27,8 +27,8 @@ def get_capitulo(cie10, df_capitulos):
         return 'Sin clasificar'
     codigo = str(cie10).upper().strip()
     for _, row in df_capitulos.iterrows():
-        if row['codigo_inicio'] <= codigo <= row['codigo_fin']:
-            return row['capitulo']
+        if row['rango_inicio'] <= codigo <= row['rango_fin']:
+            return row['nombre']
     return 'Sin clasificar'
 
 

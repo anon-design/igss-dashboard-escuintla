@@ -140,8 +140,7 @@ def render(df_procedencia):
                 x='Casos',
                 y='Departamento',
                 title='TOP 10 Departamentos de Procedencia',
-                orientation='h',
-                color=COLORS.get('primary', '#1f77b4')
+                orientation='h'
             )
             st.plotly_chart(fig_deptos, use_container_width=True)
 
@@ -180,8 +179,7 @@ def render(df_procedencia):
                 x='Casos',
                 y='Municipio',
                 title='TOP 10 Municipios de Procedencia',
-                orientation='h',
-                color=COLORS.get('success', '#2ca02c')
+                orientation='h'
             )
             st.plotly_chart(fig_munis, use_container_width=True)
 
