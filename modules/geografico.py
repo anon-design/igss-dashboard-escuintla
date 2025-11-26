@@ -317,7 +317,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
                     return '45-59 (Adulto mayor)'
                 else:
                     return '60+ (Adulto mayor)'
-            except:
+            except (ValueError, AttributeError, TypeError):
                 return 'No especificado'
 
         df_edad = df.copy()

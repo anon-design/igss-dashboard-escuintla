@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from config import COLORS
-from utils.data_loader import get_cie10_chapter
+from utils.data_loader import get_capitulo_mapping, get_cie10_chapter_fast
 from utils.filters import get_top_n
 from utils.colors import (
     create_bar_chart,
@@ -39,11 +39,20 @@ def render(df, df_capitulos):
         st.warning("No hay datos disponibles con los filtros seleccionados.")
         return
 
-    # Agregar columna de capítulo a cada registro
+    # OPTIMIZACIÓN V2: Usar mapeo pre-calculado y cacheado
+    # El mapeo se calcula UNA sola vez y se cachea
+    mapeo_global = get_capitulo_mapping(df_capitulos)
+
+    # Mapear códigos únicos usando lookup O(1)
+    codigos_unicos = df['CIE10'].unique()
+    mapeo_capitulos = {
+        codigo: get_cie10_chapter_fast(codigo, mapeo_global)
+        for codigo in codigos_unicos
+    }
+
+    # Agregar columna de capítulo usando el mapeo (muy rápido)
     df_capitulos_analisis = df.copy()
-    df_capitulos_analisis['Capitulo'] = df_capitulos_analisis['CIE10'].apply(
-        lambda x: get_cie10_chapter(x, df_capitulos)
-    )
+    df_capitulos_analisis['Capitulo'] = df_capitulos_analisis['CIE10'].map(mapeo_capitulos)
 
     # Agrupar por capítulo
     casos_por_capitulo = df_capitulos_analisis.groupby('Capitulo')['Casos'].sum().reset_index()

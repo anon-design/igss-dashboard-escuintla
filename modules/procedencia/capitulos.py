@@ -15,21 +15,11 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from config import COLORS
 from utils.filters import UNIDAD_GENERAL_PROCEDENCIA
+from utils.data_loader import get_capitulo_mapping, get_cie10_chapter_fast
 from utils.colors import (
     create_bar_chart, create_line_chart, create_pie_chart,
     create_metric_card_html, format_large_number
 )
-
-
-def get_capitulo(cie10, df_capitulos):
-    """Obtiene el capítulo CIE-10 para un código"""
-    if pd.isna(cie10):
-        return 'Sin clasificar'
-    codigo = str(cie10).upper().strip()
-    for _, row in df_capitulos.iterrows():
-        if row['rango_inicio'] <= codigo <= row['rango_fin']:
-            return row['nombre']
-    return 'Sin clasificar'
 
 
 def render(df_procedencia, df_capitulos, filtro_departamento=None, filtro_municipio=None):
@@ -100,10 +90,19 @@ def render(df_procedencia, df_capitulos, filtro_departamento=None, filtro_munici
         return
 
     # =========================================================================
-    # CLASIFICAR POR CAPÍTULOS
+    # CLASIFICAR POR CAPÍTULOS (OPTIMIZADO V2)
     # =========================================================================
+    # Usar mapeo pre-calculado y cacheado (O(1) lookup)
+    mapeo_global = get_capitulo_mapping(df_capitulos)
+
+    codigos_unicos = df_filtrado['CIE10'].unique()
+    mapeo_capitulos = {
+        codigo: get_cie10_chapter_fast(codigo, mapeo_global)
+        for codigo in codigos_unicos
+    }
+
     df_analisis = df_filtrado.copy()
-    df_analisis['Capitulo'] = df_analisis['CIE10'].apply(lambda x: get_capitulo(x, df_capitulos))
+    df_analisis['Capitulo'] = df_analisis['CIE10'].map(mapeo_capitulos)
 
     # =========================================================================
     # MÉTRICAS

@@ -120,6 +120,87 @@ def load_cie10_capitulos():
 
 
 @st.cache_data
+def get_capitulo_mapping(_df_capitulos):
+    """
+    Pre-calcula el mapeo de TODOS los códigos CIE-10 posibles a sus capítulos.
+    Esto se hace UNA SOLA VEZ y se cachea.
+
+    Genera códigos del A00-Z99 (26 letras × 100 números = 2600 combinaciones base)
+
+    Returns:
+        dict: Mapeo {codigo: nombre_capitulo}
+    """
+    if _df_capitulos.empty:
+        return {}
+
+    mapeo = {}
+
+    # Para cada capítulo, generar todos los códigos que pertenecen a él
+    for _, row in _df_capitulos.iterrows():
+        inicio = str(row['rango_inicio']).upper()
+        fin = str(row['rango_fin']).upper()
+        nombre = row['nombre']
+
+        letra_inicio = inicio[0]
+        letra_fin = fin[0]
+        num_inicio = int(inicio[1:3]) if len(inicio) >= 3 else 0
+        num_fin = int(fin[1:3]) if len(fin) >= 3 else 99
+
+        # Iterar sobre las letras del rango
+        for letra_ord in range(ord(letra_inicio), ord(letra_fin) + 1):
+            letra = chr(letra_ord)
+
+            # Determinar rango de números para esta letra
+            if letra == letra_inicio and letra == letra_fin:
+                start_num, end_num = num_inicio, num_fin
+            elif letra == letra_inicio:
+                start_num, end_num = num_inicio, 99
+            elif letra == letra_fin:
+                start_num, end_num = 0, num_fin
+            else:
+                start_num, end_num = 0, 99
+
+            # Generar todos los códigos
+            for num in range(start_num, end_num + 1):
+                codigo_base = f"{letra}{num:02d}"
+                mapeo[codigo_base] = nombre
+                # También agregar variantes con sufijos comunes
+                for sufijo in range(10):
+                    mapeo[f"{codigo_base}{sufijo}"] = nombre
+
+    return mapeo
+
+
+def get_cie10_chapter_fast(cie10_code, mapeo_capitulos):
+    """
+    Versión RÁPIDA de get_cie10_chapter usando lookup directo.
+
+    Args:
+        cie10_code (str): Código CIE-10
+        mapeo_capitulos (dict): Diccionario pre-calculado de mapeos
+
+    Returns:
+        str: Nombre del capítulo o "Sin clasificar"
+    """
+    if pd.isna(cie10_code) or cie10_code == '':
+        return "Sin clasificar"
+
+    codigo = str(cie10_code).strip().upper()
+
+    # Intentar lookup directo
+    if codigo in mapeo_capitulos:
+        return mapeo_capitulos[codigo]
+
+    # Intentar con solo los primeros 3 caracteres (base del código)
+    if len(codigo) >= 3:
+        codigo_base = codigo[:3]
+        if codigo_base in mapeo_capitulos:
+            return mapeo_capitulos[codigo_base]
+
+    return "Sin clasificar"
+
+
+@st.cache_data
 def load_cie10_eno():
     """
     Carga el catálogo de Enfermedades de Notificación Obligatoria (ENO).
@@ -176,7 +257,7 @@ def get_cie10_chapter(cie10_code, df_capitulos):
     letra = cie10_code[0]
     try:
         numero = int(''.join([c for c in cie10_code[1:] if c.isdigit()][:2]))
-    except:
+    except (ValueError, IndexError):
         return "Sin clasificar"
 
     # Buscar en catálogo
@@ -191,7 +272,7 @@ def get_cie10_chapter(cie10_code, df_capitulos):
         try:
             num_inicio = int(''.join([c for c in inicio[1:] if c.isdigit()][:2]))
             num_fin = int(''.join([c for c in fin[1:] if c.isdigit()][:2]))
-        except:
+        except (ValueError, IndexError):
             continue
 
         # Verificar si el código está en el rango
@@ -257,7 +338,7 @@ def is_cronica(cie10_code, df_cronicas):
                 inicio, fin = cronica_code.split('-')
                 if inicio <= cie10_code <= fin:
                     return True
-            except:
+            except ValueError:
                 continue
 
     return False
