@@ -13,7 +13,7 @@ sys.path.append(str(Path(__file__).parent))
 
 from config import PAGE_CONFIG, CUSTOM_CSS
 from utils.data_loader import load_all_data, load_procedencia_data
-from utils.filters import apply_filters_jerarquicos, get_summary_stats
+from utils.filters import apply_filters_jerarquicos, get_summary_stats, apply_filters_procedencia
 from utils.auth import check_password, render_logout_button
 
 # --- Importar Módulos de UI ---
@@ -110,8 +110,34 @@ def main():
     # --- 3. Cargar datos de procedencia (lazy loading) ---
     # Solo se carga cuando se accede a la página de procedencia
     df_procedencia = None
+    df_procedencia_todas_unidades = None
     if filtros["selected_page"].startswith("procedencia"):
-        df_procedencia = load_procedencia_data()
+        df_procedencia_raw = load_procedencia_data()
+
+        # Aplicar filtros globales (año, sexo, edad) a los datos de procedencia
+        # VERSIÓN 1: Solo "General Escuintla Procedencia" (para módulos estándar)
+        df_procedencia = apply_filters_procedencia(
+            df_procedencia_raw,
+            unidades=None,  # None = solo General (evita duplicación)
+            anios=filtros["filtro_año"],
+            departamentos=None,  # Filtros geográficos se manejan en cada módulo
+            municipios=None,
+            sexos=filtros["filtro_sexo"],
+            edades=filtros["filtro_edad"]
+        )
+
+        # VERSIÓN 2: TODAS las unidades (para Sankey y análisis cruzado)
+        # Estos módulos necesitan ver los flujos entre unidades específicas
+        todas_las_unidades = df_procedencia_raw['Unidad'].unique().tolist()
+        df_procedencia_todas_unidades = apply_filters_procedencia(
+            df_procedencia_raw,
+            unidades=todas_las_unidades,  # Incluir todas las unidades
+            anios=filtros["filtro_año"],
+            departamentos=None,
+            municipios=None,
+            sexos=filtros["filtro_sexo"],
+            edades=filtros["filtro_edad"]
+        )
 
     # --- 4. Enrutador de Páginas ---
     # Un diccionario mapea la selección del usuario a la función de renderizado correspondiente.
@@ -134,9 +160,10 @@ def main():
         "procedencia_eno": lambda: proc_eno.render(df_procedencia, datos['eno']),
         "procedencia_cronicas": lambda: proc_cronicas.render(df_procedencia, datos['cronicas']),
         # Módulos de PROCEDENCIA V2 (análisis avanzado)
+        # Estos módulos usan df_procedencia_todas_unidades para ver flujos entre unidades
         "separator2": lambda: st.info("Seleccione un módulo de análisis avanzado"),
-        "procedencia_sankey": lambda: proc_sankey.render(df_procedencia),
-        "procedencia_cruzado": lambda: proc_cruzado.render(df_procedencia)
+        "procedencia_sankey": lambda: proc_sankey.render(df_procedencia_todas_unidades),
+        "procedencia_cruzado": lambda: proc_cruzado.render(df_procedencia_todas_unidades)
     }
     
     # Ejecutar la función de renderizado de la página seleccionada.
