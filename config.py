@@ -21,8 +21,8 @@ DATA_FILE = DATA_DIR / "Rangos_SIN_PROCEDENCIA.csv"
 DATA_PATH = str(DATA_FILE)  # Alias como string para compatibilidad
 
 # Archivo de datos de PROCEDENCIA (nuevo)
-# Ubicado en bases_limpias (nivel superior)
-PROCEDENCIA_FILE = BASE_DIR.parent / "bases_limpias" / "Procedencia_CONSOLIDADA.csv"
+# Ubicado en data/ (mismo directorio que Rangos)
+PROCEDENCIA_FILE = DATA_DIR / "Procedencia_CONSOLIDADA.csv"
 
 # Asegurar que los directorios existen
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
