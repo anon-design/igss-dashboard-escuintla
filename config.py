@@ -130,7 +130,7 @@ UNIDADES = [
     "Consultorio Siquinala",
 ]
 
-# Unidades de datos de PROCEDENCIA
+# Unidades de datos de PROCEDENCIA (8 unidades)
 UNIDADES_PROCEDENCIA = [
     "General Escuintla Procedencia",
     "Consultorio Masagua Procedencia",
@@ -138,6 +138,7 @@ UNIDADES_PROCEDENCIA = [
     "Consultorio La Gomera Procedencia",
     "Consultorio Siquinala Procedencia",
     "Hospital Escuintla Procedencia",
+    "Hospital Tiquisate Procedencia",
     "Consultorio Palín Procedencia"
 ]
 
