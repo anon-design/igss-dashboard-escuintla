@@ -30,6 +30,10 @@ from modules.procedencia import (
     eno as proc_eno,
     cronicas as proc_cronicas
 )
+from modules.procedencia_v2 import (
+    sankey_flujos as proc_sankey,
+    analisis_cruzado as proc_cruzado
+)
 
 # --- Configuración de la Página ---
 st.set_page_config(**PAGE_CONFIG)
@@ -128,7 +132,11 @@ def main():
         "procedencia_pediatrica": lambda: proc_pediatrica.render(df_procedencia, datos['eno'], datos['cronicas'], datos['diagnosticos']),
         "procedencia_capitulos": lambda: proc_capitulos.render(df_procedencia, datos['capitulos']),
         "procedencia_eno": lambda: proc_eno.render(df_procedencia, datos['eno']),
-        "procedencia_cronicas": lambda: proc_cronicas.render(df_procedencia, datos['cronicas'])
+        "procedencia_cronicas": lambda: proc_cronicas.render(df_procedencia, datos['cronicas']),
+        # Módulos de PROCEDENCIA V2 (análisis avanzado)
+        "separator2": lambda: st.info("Seleccione un módulo de análisis avanzado"),
+        "procedencia_sankey": lambda: proc_sankey.render(df_procedencia),
+        "procedencia_cruzado": lambda: proc_cruzado.render(df_procedencia)
     }
     
     # Ejecutar la función de renderizado de la página seleccionada.

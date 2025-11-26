@@ -38,7 +38,10 @@ def render_sidebar(df):
         "👶🌍 Procedencia: Pediátrica": "procedencia_pediatrica",
         "📚🌍 Procedencia: Capítulos": "procedencia_capitulos",
         "⚠️🌍 Procedencia: ENO": "procedencia_eno",
-        "💊🌍 Procedencia: Crónicas": "procedencia_cronicas"
+        "💊🌍 Procedencia: Crónicas": "procedencia_cronicas",
+        "───── Análisis Avanzado ─────": "separator2",
+        "🔀 Flujos Sankey": "procedencia_sankey",
+        "📊 Análisis Cruzado": "procedencia_cruzado"
     }
 
     selected_page = st.sidebar.radio(
