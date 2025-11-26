@@ -24,8 +24,11 @@ DATA_PATH = str(DATA_FILE)  # Alias como string para compatibilidad
 # Ubicado en data/ (mismo directorio que Rangos)
 PROCEDENCIA_FILE = DATA_DIR / "Procedencia_CONSOLIDADA.csv"
 
-# Asegurar que los directorios existen
-CACHE_DIR.mkdir(parents=True, exist_ok=True)
+# Asegurar que los directorios existen (solo si es posible escribir)
+try:
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+except (PermissionError, OSError):
+    pass  # En Streamlit Cloud el filesystem puede ser read-only
 
 # ============================================================
 # PALETA DE COLORES IGSS GUATEMALA
