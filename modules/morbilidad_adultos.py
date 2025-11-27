@@ -10,6 +10,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent))
 
+from utils.filters import filter_by_age_group, get_top_n, aggregate_by_period
 from utils.colors import create_bar_chart, create_line_chart, create_metric_card_html, format_large_number, create_stacked_bar
 
 # Helper para convertir DataFrame a CSV para descarga
