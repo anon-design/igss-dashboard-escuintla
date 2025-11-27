@@ -77,21 +77,26 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
     st.markdown("---")
 
     # Top N diagnósticos
-    st.subheader("📊 Top N Diagnósticos Más Frecuentes")
+    show_all_dx = st.checkbox("Mostrar todos los diagnósticos", key="show_all_pediatricos")
 
-    top_n_value = 25 # Default value
-    with st.expander("⚙️ Opciones de Visualización"):
-        # Widget para seleccionar N
-        top_n_value = st.number_input(
-            "Selecciona el número de diagnósticos a mostrar (N):",
-            min_value=5,
-            max_value=100,
-            value=25,
-            step=5,
-            key="top_n_pediatrica" # Key para diferenciarlo del de adultos
-        )
-
-    top_n = get_top_n(df_pediatrico, n=top_n_value, group_by='CIE10')
+    subheader_dx = "📊 Diagnósticos Frecuentes" if show_all_dx else "📊 Top N Diagnósticos Más Frecuentes"
+    st.subheader(subheader_dx)
+    
+    top_n_value = 25
+    if not show_all_dx:
+        with st.expander("⚙️ Opciones de Visualización"):
+            top_n_value = st.number_input(
+                "Selecciona el número de diagnósticos a mostrar (N):",
+                min_value=5,
+                max_value=100,
+                value=25,
+                step=5,
+                key="top_n_pediatrica",
+                disabled=show_all_dx
+            )
+            
+    n_param = None if show_all_dx else top_n_value
+    top_n = get_top_n(df_pediatrico, n=n_param, group_by='CIE10')
 
     if not top_n.empty:
         # Unir con el catálogo completo de nombres
@@ -139,6 +144,19 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
         st.dataframe(top_display_renamed[column_order], width='stretch', hide_index=True)
 
         st.info("💡 **Leyenda:** ⚠️ = Enfermedad de Notificación Obligatoria | 💊 = Enfermedad Crónica")
+
+        # Botón de descarga
+        df_download = get_top_n(df_pediatrico, n=None, group_by='CIE10')
+        df_download = pd.merge(df_download, df_diagnosticos, left_on='CIE10', right_on='cie10', how='left')
+        df_download['Diagnóstico'] = df_download['nombre'].fillna('Nombre no disponible')
+        csv_data = convert_df_to_csv(df_download[['Rank', 'CIE10', 'Diagnóstico', 'Casos']])
+        
+        st.download_button(
+           label="📥 Descargar todos los diagnósticos (CSV)",
+           data=csv_data,
+           file_name="diagnosticos_pediatricos.csv",
+           mime="text/csv",
+        )
 
         # Gráfico de barras horizontales
         st.subheader(f"📈 Visualización Top {len(top_n_filtrado)}")
