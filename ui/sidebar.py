@@ -24,9 +24,7 @@ def render_sidebar(df):
     st.sidebar.markdown("---")
 
     # --- 1. Menú de Navegación ---
-    # Se refactoriza el menú para usar secciones y callbacks, mejorando la UI.
-
-    # Opciones del menú divididas en diccionarios para cada sección.
+    # Refactorización con keys únicas y gestión de estado para corregir error.
     main_options = {
         "🏠 Inicio": "inicio",
         "👨 Morbilidad Adultos": "adultos",
@@ -36,7 +34,6 @@ def render_sidebar(df):
         "💊 Enfermedades Crónicas": "cronicas",
         "🗺️ Análisis Geográfico": "geografico",
     }
-    
     procedencia_options = {
         "🌍 Procedencia: General": "procedencia_general",
         "👨🌍 Procedencia: Adultos": "procedencia_adultos",
@@ -45,64 +42,59 @@ def render_sidebar(df):
         "⚠️🌍 Procedencia: ENO": "procedencia_eno",
         "💊🌍 Procedencia: Crónicas": "procedencia_cronicas",
     }
-
     avanzado_options = {
         "🔀 Flujos Sankey": "procedencia_sankey",
         "📊 Análisis Cruzado": "procedencia_cruzado"
     }
-
-    # Mapa completo para buscar el valor corto a partir de la etiqueta
     page_mapping = {**main_options, **procedencia_options, **avanzado_options}
 
-    # Inicializar el estado de la sesión si no existe
     if 'selected_page_key' not in st.session_state:
         st.session_state.selected_page_key = "🏠 Inicio"
 
-    # Callback para actualizar la página seleccionada
-    def set_page():
-        # 'radio_selection' es la clave temporal que Streamlit usa internamente para el widget
-        st.session_state.selected_page_key = st.session_state.radio_selection
+    # Se captura la selección activa ANTES de renderizar los widgets
+    active_selection = st.session_state.selected_page_key
 
-    # --- Renderizado del menú por secciones ---
+    # --- Renderizado del menú por secciones con keys únicas ---
     st.sidebar.markdown("##### Análisis General")
-    st.sidebar.radio(
-        "Módulos Principales",
-        options=main_options.keys(),
-        key="radio_selection",  # Clave única para el estado del widget
-        on_change=set_page,
-        label_visibility="collapsed",
-        # El índice se establece buscando la clave actual en las opciones de esta sección
-        index=list(main_options.keys()).index(st.session_state.selected_page_key)
-        if st.session_state.selected_page_key in main_options else None,
+    r1 = st.sidebar.radio(
+        "Módulos Principales", main_options.keys(), label_visibility="collapsed",
+        key="radio_main",
+        index=list(main_options.keys()).index(active_selection) if active_selection in main_options else None
     )
 
     st.sidebar.markdown("---")
     st.sidebar.markdown("##### Análisis de Procedencia")
-    st.sidebar.radio(
-        "Módulos de Procedencia",
-        options=procedencia_options.keys(),
-        key="radio_selection",
-        on_change=set_page,
-        label_visibility="collapsed",
-        index=list(procedencia_options.keys()).index(st.session_state.selected_page_key)
-        if st.session_state.selected_page_key in procedencia_options else None,
+    r2 = st.sidebar.radio(
+        "Módulos de Procedencia", procedencia_options.keys(), label_visibility="collapsed",
+        key="radio_procedencia",
+        index=list(procedencia_options.keys()).index(active_selection) if active_selection in procedencia_options else None
     )
 
     st.sidebar.markdown("---")
     st.sidebar.markdown("##### Análisis Avanzado")
-    st.sidebar.radio(
-        "Módulos Avanzados",
-        options=avanzado_options.keys(),
-        key="radio_selection",
-        on_change=set_page,
-        label_visibility="collapsed",
-        index=list(avanzado_options.keys()).index(st.session_state.selected_page_key)
-        if st.session_state.selected_page_key in avanzado_options else None,
+    r3 = st.sidebar.radio(
+        "Módulos Avanzados", avanzado_options.keys(), label_visibility="collapsed",
+        key="radio_avanzado",
+        index=list(avanzado_options.keys()).index(active_selection) if active_selection in avanzado_options else None
     )
     
-    st.sidebar.markdown("---")
+    # --- Lógica para detectar el cambio y forzar el rerun ---
+    # Comprobar si la selección de algún radio ha cambiado respecto al estado guardado
+    new_selection = None
+    if r1 != active_selection and r1 in main_options:
+        new_selection = r1
+    elif r2 != active_selection and r2 in procedencia_options:
+        new_selection = r2
+    elif r3 != active_selection and r3 in avanzado_options:
+        new_selection = r3
 
-    # El valor a retornar se obtiene del mapa usando la clave guardada en el estado
+    # Si hay una nueva selección, actualizar el estado y re-ejecutar el script
+    if new_selection:
+        st.session_state.selected_page_key = new_selection
+        st.rerun()
+
+    st.sidebar.markdown("---")
+    
     selected_page_value = page_mapping.get(st.session_state.selected_page_key, "inicio")
 
     # --- 2. Filtros Globales ---
