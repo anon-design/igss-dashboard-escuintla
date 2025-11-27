@@ -263,7 +263,7 @@ def render(df_procedencia):
             titulo += f" ({', '.join(filtro_depto[:2])}{'...' if len(filtro_depto) > 2 else ''})"
 
         fig_sankey = crear_sankey(datos_sankey, titulo)
-        st.plotly_chart(fig_sankey, use_container_width=True)
+        st.plotly_chart(fig_sankey, width='stretch')
 
         st.caption(f"""
         **Cómo leer este diagrama:**
@@ -298,7 +298,7 @@ def render(df_procedencia):
                 'Casos_fmt': 'Casos'
             }
         ),
-        use_container_width=True,
+        width='stretch',
         hide_index=True,
         height=500
     )

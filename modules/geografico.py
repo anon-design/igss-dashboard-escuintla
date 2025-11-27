@@ -97,7 +97,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
         tabla_display = tabla_display[['Rank', 'Unidad', 'Casos', 'Porcentaje']]
         tabla_display.columns = ['#', 'Unidad Médica', 'Casos', '%']
 
-        st.dataframe(tabla_display, use_container_width=True, hide_index=True)
+        st.dataframe(tabla_display, width='stretch', hide_index=True)
 
         # Gráfico de barras horizontales
         st.subheader("📈 Visualización por Unidad")
@@ -115,7 +115,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
             height=max(400, len(casos_por_unidad) * 50)  # Altura dinámica
         )
 
-        st.plotly_chart(fig_barras, use_container_width=True)
+        st.plotly_chart(fig_barras, width='stretch')
 
     st.markdown("---")
 
@@ -147,7 +147,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
             )
 
             fig_pie.update_layout(height=500)
-            st.plotly_chart(fig_pie, use_container_width=True)
+            st.plotly_chart(fig_pie, width='stretch')
 
     with col2:
         st.markdown("**Resumen por Unidad:**")
@@ -155,7 +155,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
         resumen_display['Casos'] = resumen_display['Casos'].apply(format_large_number)
         resumen_display = resumen_display[['Rank', 'Unidad', 'Casos', 'Porcentaje']]
         resumen_display.columns = ['#', 'Unidad', 'Casos', '%']
-        st.dataframe(resumen_display, use_container_width=True, hide_index=True)
+        st.dataframe(resumen_display, width='stretch', hide_index=True)
 
     st.markdown("---")
 
@@ -179,7 +179,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
             )
 
             fig_lineas.update_layout(height=500)
-            st.plotly_chart(fig_lineas, use_container_width=True)
+            st.plotly_chart(fig_lineas, width='stretch')
 
     st.markdown("---")
 
@@ -255,7 +255,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
                     tabla_top_n = tabla_top_n[['Rank', 'Diagnóstico', 'CIE10', 'Casos', 'Porcentaje', 'Es_ENO', 'Es_Cronica']]
                     tabla_top_n.columns = ['#', 'Diagnóstico', 'CIE-10', 'Casos', '%', 'ENO', 'Crónica']
                     
-                    st.dataframe(tabla_top_n, use_container_width=True, hide_index=True)
+                    st.dataframe(tabla_top_n, width='stretch', hide_index=True)
                     st.info("💡 **Leyenda:** ⚠️ = ENO | 💊 = Crónica")
 
                 with col2:
@@ -271,7 +271,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
                         yaxis={'categoryorder': 'total ascending'},
                         height=max(400, len(top_n_filtrado) * 30)
                     )
-                    st.plotly_chart(fig_top_n, use_container_width=True)
+                    st.plotly_chart(fig_top_n, width='stretch')
             else:
                 st.warning("No hay diagnósticos seleccionados para mostrar.")
 
@@ -295,7 +295,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
             )
 
             fig_sexo.update_layout(height=500)
-            st.plotly_chart(fig_sexo, use_container_width=True)
+            st.plotly_chart(fig_sexo, width='stretch')
 
     st.markdown("---")
 
@@ -338,7 +338,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
             )
 
             fig_edad.update_layout(height=500)
-            st.plotly_chart(fig_edad, use_container_width=True)
+            st.plotly_chart(fig_edad, width='stretch')
 
     st.markdown("---")
 

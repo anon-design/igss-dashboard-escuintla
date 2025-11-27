@@ -177,7 +177,7 @@ def render_sidebar(df):
 
     # --- 4. Retornar valores ---
     return {
-        "selected_page": menu_options[selected_page],
+        "selected_page": selected_page_value,
         "filtro_unidad": filtro_unidad,
         "filtro_año": filtro_año,
         "filtro_sexo": filtro_sexo,

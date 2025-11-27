@@ -134,7 +134,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
             'Es_ENO': 'ENO',
             'Es_Cronica': 'Crónica'
         })
-        st.dataframe(top_display_renamed[column_order], use_container_width=True, hide_index=True)
+        st.dataframe(top_display_renamed[column_order], width='stretch', hide_index=True)
 
         st.info("💡 **Leyenda:** ⚠️ = Enfermedad de Notificación Obligatoria | 💊 = Enfermedad Crónica")
 
@@ -155,7 +155,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
                 height=max(400, len(top_n_filtrado) * 30) # Altura dinámica
             )
 
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
         else:
             st.warning("No hay diagnósticos seleccionados para mostrar en el gráfico.")
 
@@ -190,7 +190,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
                 title=f'Evolución Temporal de los {num_top_temporal} Diagnósticos Más Frecuentes',
                 color='Diagnóstico' # Usar nombre del diagnóstico en la leyenda
             )
-            st.plotly_chart(fig_lineas, use_container_width=True)
+            st.plotly_chart(fig_lineas, width='stretch')
 
         st.markdown("---")
 
@@ -211,7 +211,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
                     title='Distribución por Sexo',
                     color='Sexo'
                 )
-                st.plotly_chart(fig_sexo, use_container_width=True)
+                st.plotly_chart(fig_sexo, width='stretch')
 
         with col2:
             # Tabla resumen por sexo
@@ -225,7 +225,7 @@ def render(df, df_eno, df_cronicas, df_diagnosticos):
 
             if not pivot_sexo.empty:
                 st.markdown("**Resumen Numérico:**")
-                st.dataframe(pivot_sexo.style.format("{:,.0f}"), use_container_width=True)
+                st.dataframe(pivot_sexo.style.format("{:,.0f}"), width='stretch')
     else:
         st.warning("No hay diagnósticos seleccionados para mostrar análisis temporal o por sexo.")
 

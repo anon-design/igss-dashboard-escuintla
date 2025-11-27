@@ -153,7 +153,7 @@ def render(df_procedencia, df_eno, df_cronicas, df_diagnosticos,
             top_display[['Rank', 'Diagnóstico', 'CIE10', 'Casos', 'Porcentaje', 'Es_ENO', 'Es_Cronica']].rename(
                 columns={'Rank': '#', 'CIE10': 'Código', 'Porcentaje': '%', 'Es_ENO': 'ENO', 'Es_Cronica': 'Crónica'}
             ),
-            use_container_width=True, hide_index=True
+            width='stretch', hide_index=True
         )
 
         st.info("💡 **Leyenda:** ⚠️ = ENO | 💊 = Enfermedad Crónica")
@@ -177,7 +177,7 @@ def render(df_procedencia, df_eno, df_cronicas, df_diagnosticos,
         fig = create_bar_chart(top_grafico, x='Casos', y='Diagnóstico',
                                title=f'Top {len(top_grafico)} Diagnósticos Pediátricos - Por Procedencia', orientation='h')
         fig.update_layout(height=max(400, len(top_grafico) * 35))
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     st.markdown("---")
 
@@ -197,14 +197,14 @@ def render(df_procedencia, df_eno, df_cronicas, df_diagnosticos,
         if not tendencia.empty:
             fig_lineas = create_line_chart(tendencia, x='Año', y='Casos',
                                            title=f'Evolución Temporal - Top {num_top}', color='Diagnóstico')
-            st.plotly_chart(fig_lineas, use_container_width=True)
+            st.plotly_chart(fig_lineas, width='stretch')
 
         # Sexo
         st.subheader(f"👥 Distribución por Sexo - Top {num_top}")
         dist_sexo = df_temporal.groupby(['Diagnóstico', 'Sexo'])['Casos'].sum().reset_index()
         if not dist_sexo.empty:
             fig_sexo = create_stacked_bar(dist_sexo, x='Diagnóstico', y='Casos', title='Por Sexo', color='Sexo')
-            st.plotly_chart(fig_sexo, use_container_width=True)
+            st.plotly_chart(fig_sexo, width='stretch')
 
     # Info
     with st.expander("ℹ️ Información"):

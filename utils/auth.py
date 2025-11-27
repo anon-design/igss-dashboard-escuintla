@@ -90,7 +90,7 @@ def render_login_screen():
         # Botón de login
         col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
         with col_btn2:
-            login_button = st.button("🔓 Ingresar", use_container_width=True)
+            login_button = st.button("🔓 Ingresar", width='stretch')
 
         # Verificar contraseña
         if login_button:
@@ -127,5 +127,5 @@ def render_logout_button():
     Renderiza un botón de cerrar sesión en el sidebar
     """
     st.sidebar.markdown("---")
-    if st.sidebar.button("🚪 Cerrar Sesión", use_container_width=True):
+    if st.sidebar.button("🚪 Cerrar Sesión", width='stretch'):
         logout()

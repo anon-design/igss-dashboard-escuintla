@@ -111,7 +111,7 @@ def render(df, df_capitulos):
         tabla_display = tabla_display[['Rank', 'Capitulo', 'Casos', 'Porcentaje']]
         tabla_display.columns = ['#', 'Capítulo CIE-10', 'Casos', '%']
 
-        st.dataframe(tabla_display, use_container_width=True, hide_index=True)
+        st.dataframe(tabla_display, width='stretch', hide_index=True)
 
         # Gráfico de barras horizontales
         st.subheader("📈 Visualización por Capítulo")
@@ -129,7 +129,7 @@ def render(df, df_capitulos):
             height=600
         )
 
-        st.plotly_chart(fig_barras, use_container_width=True)
+        st.plotly_chart(fig_barras, width='stretch')
 
     st.markdown("---")
 
@@ -189,7 +189,7 @@ def render(df, df_capitulos):
             )
 
             fig_pie.update_layout(height=500)
-            st.plotly_chart(fig_pie, use_container_width=True)
+            st.plotly_chart(fig_pie, width='stretch')
 
     with col2:
         if not casos_por_capitulo_filtrado.empty:
@@ -198,7 +198,7 @@ def render(df, df_capitulos):
             top_display['Casos'] = top_display['Casos'].apply(format_large_number)
             top_display = top_display[['Rank', 'Capitulo', 'Casos', 'Porcentaje']]
             top_display.columns = ['#', 'Capítulo', 'Casos', '%']
-            st.dataframe(top_display, use_container_width=True, hide_index=True, height=450)
+            st.dataframe(top_display, width='stretch', hide_index=True, height=450)
 
     st.markdown("---")
 
@@ -224,7 +224,7 @@ def render(df, df_capitulos):
 
         fig_lineas.update_layout(height=500)
 
-        st.plotly_chart(fig_lineas, use_container_width=True)
+        st.plotly_chart(fig_lineas, width='stretch')
 
     st.markdown("---")
 
@@ -251,7 +251,7 @@ def render(df, df_capitulos):
             )
 
             fig_sexo.update_layout(height=500)
-            st.plotly_chart(fig_sexo, use_container_width=True)
+            st.plotly_chart(fig_sexo, width='stretch')
 
     st.markdown("---")
 

@@ -133,7 +133,7 @@ def render(df, df_cronicas):
         tabla_display = tabla_display[['Rank', 'CIE10', 'nombre', 'categoria', 'Casos', 'Porcentaje']]
         tabla_display.columns = ['#', 'CIE-10', 'Enfermedad', 'Categoría', 'Casos', '%']
 
-        st.dataframe(tabla_display, use_container_width=True, hide_index=True)
+        st.dataframe(tabla_display, width='stretch', hide_index=True)
 
         # Gráfico de barras
         st.subheader(f"📈 Visualización Top {len(top_cronicas_filtrado)}")
@@ -149,7 +149,7 @@ def render(df, df_cronicas):
             yaxis={'categoryorder': 'total ascending'},
             height=max(400, len(top_cronicas_filtrado) * 35)
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     else:
         st.warning("No hay enfermedades seleccionadas para mostrar.")
 
@@ -172,7 +172,7 @@ def render(df, df_cronicas):
                 title='Distribución por Categoría'
             )
             fig_pie.update_layout(height=500)
-            st.plotly_chart(fig_pie, use_container_width=True)
+            st.plotly_chart(fig_pie, width='stretch')
 
     with col2:
         st.markdown("**Casos por Categoría:**")
@@ -182,7 +182,7 @@ def render(df, df_cronicas):
             casos_por_categoria[['categoria', 'Casos_fmt', 'Porcentaje']].rename(
                 columns={'categoria': 'Categoría', 'Casos_fmt': 'Casos', 'Porcentaje': '%'}
             ),
-            use_container_width=True,
+            width='stretch',
             hide_index=True
         )
 
@@ -213,7 +213,7 @@ def render(df, df_cronicas):
                 title=f'Evolución Temporal de las {num_top_temporal} Crónicas Más Frecuentes',
                 color='nombre'
             )
-            st.plotly_chart(fig_lineas, use_container_width=True)
+            st.plotly_chart(fig_lineas, width='stretch')
     else:
         st.warning("No hay enfermedades seleccionadas para mostrar análisis temporal.")
 

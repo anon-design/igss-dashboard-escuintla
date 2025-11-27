@@ -253,7 +253,7 @@ def render(df_procedencia):
             df_dist_unidad = res_foraneos['dist_unidad']
             df_dist_unidad['Unidad'] = df_dist_unidad['Unidad'].str.replace(' Procedencia', '')
             df_dist_unidad['Casos'] = df_dist_unidad['Casos'].apply(lambda x: format_large_number(int(x)))
-            st.dataframe(df_dist_unidad, use_container_width=True, hide_index=True)
+            st.dataframe(df_dist_unidad, width='stretch', hide_index=True)
             
             csv_foraneos = convert_df_to_csv(res_foraneos['dist_unidad'])
             st.download_button(
@@ -272,10 +272,10 @@ def render(df_procedencia):
                 title='Top 10 Unidades por Casos Foráneos',
                 orientation='h'
             )
-            st.plotly_chart(fig_foraneos, use_container_width=True)
+            st.plotly_chart(fig_foraneos, width='stretch')
 
         st.markdown("##### Departamentos de origen de pacientes foráneos")
-        st.dataframe(res_foraneos['dist_depto'], use_container_width=True, hide_index=True)
+        st.dataframe(res_foraneos['dist_depto'], width='stretch', hide_index=True)
         csv_deptos = convert_df_to_csv(res_foraneos['dist_depto'])
         st.download_button(
             label="📥 Descargar datos de Departamentos (CSV)",
@@ -351,7 +351,7 @@ def render(df_procedencia):
     st.subheader("Mapa de Calor: Distribución Geográfica por Unidad")
 
     fig_heatmap = crear_heatmap_unidad_depto(df_procedencia, unidades_seleccionadas)
-    st.plotly_chart(fig_heatmap, use_container_width=True)
+    st.plotly_chart(fig_heatmap, width='stretch')
 
     st.caption("""
     **Interpretación:** Cada columna representa una unidad y suma 100%.
@@ -368,7 +368,7 @@ def render(df_procedencia):
         st.subheader("Perfil Comparativo de Procedencia")
 
         fig_radar = crear_radar_comparativo(df_procedencia, unidades_seleccionadas)
-        st.plotly_chart(fig_radar, use_container_width=True)
+        st.plotly_chart(fig_radar, width='stretch')
 
         st.caption("""
         **Interpretación:** Cada línea representa una unidad. Las puntas del radar
@@ -405,7 +405,7 @@ def render(df_procedencia):
 
     st.dataframe(
         tabla_wide,
-        use_container_width=True,
+        width='stretch',
         hide_index=True,
         height=450
     )
@@ -442,7 +442,7 @@ def render(df_procedencia):
     with col_tabla:
         st.dataframe(
             df_concentracion,
-            use_container_width=True,
+            width='stretch',
             hide_index=True
         )
 
@@ -457,7 +457,7 @@ def render(df_procedencia):
             color_continuous_scale='Blues'
         )
         fig_conc.update_layout(height=350, showlegend=False)
-        st.plotly_chart(fig_conc, use_container_width=True)
+        st.plotly_chart(fig_conc, width='stretch')
 
     # =========================================================================
     # INFORMACIÓN

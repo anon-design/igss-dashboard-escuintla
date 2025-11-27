@@ -143,7 +143,7 @@ def render(df_procedencia, df_eno, filtro_departamento=None, filtro_municipio=No
             tabla_display[['Rank', 'ENO', 'CIE10', 'Casos', 'Porcentaje']].rename(
                 columns={'Rank': '#', 'Porcentaje': '%'}
             ),
-            use_container_width=True, hide_index=True, height=400
+            width='stretch', hide_index=True, height=400
         )
         
         csv_data = convert_df_to_csv(casos_por_eno[['Rank', 'CIE10', 'ENO', 'Casos', 'Porcentaje']])
@@ -158,7 +158,7 @@ def render(df_procedencia, df_eno, filtro_departamento=None, filtro_municipio=No
         top_10 = casos_por_eno.head(10).sort_values('Casos', ascending=True)
         fig = create_bar_chart(top_10, x='Casos', y='ENO', title='Top 10 ENO', orientation='h')
         fig.update_layout(height=400)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     st.markdown("---")
 
@@ -178,7 +178,7 @@ def render(df_procedencia, df_eno, filtro_departamento=None, filtro_municipio=No
     if not tendencia.empty:
         fig_lineas = create_line_chart(tendencia, x='Año', y='Casos',
                                        title=f'Evolución Temporal - Top {num_eno} ENO', color='ENO')
-        st.plotly_chart(fig_lineas, use_container_width=True)
+        st.plotly_chart(fig_lineas, width='stretch')
 
     st.markdown("---")
 
@@ -200,14 +200,14 @@ def render(df_procedencia, df_eno, filtro_departamento=None, filtro_municipio=No
                 dist_geo[['Departamento', 'Casos_fmt', 'Porcentaje']].rename(
                     columns={'Casos_fmt': 'Casos ENO', 'Porcentaje': '%'}
                 ),
-                use_container_width=True, hide_index=True
+                width='stretch', hide_index=True
             )
 
         with col_g:
             top_deptos = dist_geo.head(10).sort_values('Casos', ascending=True)
             fig_geo = create_bar_chart(top_deptos, x='Casos', y='Departamento',
                                        title='Top 10 Departamentos con ENO', orientation='h')
-            st.plotly_chart(fig_geo, use_container_width=True)
+            st.plotly_chart(fig_geo, width='stretch')
 
     # Info
     with st.expander("ℹ️ Información sobre ENO"):
