@@ -496,6 +496,7 @@ def calcular_casos_otros_procedencia(df):
     return total_general - total_especificas
 
 
+@st.cache_data
 def apply_filters_procedencia(df, unidades=None, anios=None, departamentos=None,
                                municipios=None, sexos=None, edades=None):
     """
