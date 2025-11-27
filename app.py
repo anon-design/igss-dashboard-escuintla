@@ -7,10 +7,6 @@ import streamlit as st
 import sys
 from pathlib import Path
 
-# --- Configuración de Path y Estilos ---
-# Asegura que los módulos del proyecto se puedan importar correctamente.
-sys.path.append(str(Path(__file__).parent))
-
 from config import PAGE_CONFIG, CUSTOM_CSS
 from utils.data_loader import load_all_data, load_procedencia_data
 from utils.filters import apply_filters_jerarquicos, get_summary_stats, apply_filters_procedencia
