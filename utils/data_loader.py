@@ -8,11 +8,12 @@ from pathlib import Path
 import sys
 
 # Agregar el directorio padre al path para imports
-sys.path.append(str(Path(__file__).parent.parent))
+# sys.path.append(str(Path(__file__).parent.parent)) # Esta línea ya no es necesaria aquí
 
 from config import DATA_FILE, CATALOGOS_DIR, PROCEDENCIA_FILE
 
 
+@st.cache_data
 def load_all_data(uploaded_file=None):
     """
     Carga todos los datos necesarios para la aplicación, aceptando un archivo opcional.
@@ -27,6 +28,7 @@ def load_all_data(uploaded_file=None):
     return data
 
 
+@st.cache_data
 def load_data(uploaded_file=None):
     """
     Carga, limpia y reconstruye los datos para garantizar la consistencia jerárquica.
