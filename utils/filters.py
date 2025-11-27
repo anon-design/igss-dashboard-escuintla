@@ -74,20 +74,26 @@ def filter_by_cie10_codes(df, codigos):
 
 def get_top_n(df, n=25, group_by='CIE10'):
     """
-    Obtiene los top N registros más frecuentes.
+    Obtiene los top N registros más frecuentes. Si n es None o 0, devuelve todos.
 
     Args:
         df (pd.DataFrame): DataFrame con datos
-        n (int): Número de elementos en el top
+        n (int or None): Número de elementos en el top. Si es None o 0, devuelve todos.
         group_by (str): Columna por la cual agrupar ('CIE10', 'Unidad', etc.)
 
     Returns:
-        pd.DataFrame: DataFrame con top N
+        pd.DataFrame: DataFrame con los resultados.
     """
     if df.empty:
         return pd.DataFrame()
 
-    top = df.groupby(group_by)['Casos'].sum().nlargest(n).reset_index()
+    aggregated = df.groupby(group_by)['Casos'].sum()
+
+    if n and n > 0:
+        top = aggregated.nlargest(n).reset_index()
+    else:
+        top = aggregated.sort_values(ascending=False).reset_index()
+        
     top['Rank'] = range(1, len(top) + 1)
 
     return top
@@ -594,7 +600,10 @@ def get_distribucion_municipios(df, top_n=20):
     # Agrupar por municipio (incluir departamento para referencia)
     df_dist = df_general.groupby(['Municipio', 'Departamento'], as_index=False)['Casos'].sum()
     df_dist['Porcentaje'] = (df_dist['Casos'] / total_general * 100).round(2)
-    df_dist = df_dist.sort_values('Casos', ascending=False).head(top_n)
+    df_dist = df_dist.sort_values('Casos', ascending=False)
+    
+    if top_n and top_n > 0:
+        df_dist = df_dist.head(top_n)
 
     return df_dist
 

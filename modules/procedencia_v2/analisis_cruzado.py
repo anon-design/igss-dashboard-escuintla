@@ -24,11 +24,54 @@ from utils.colors import (
     create_pie_chart
 )
 
+# Helper para convertir DataFrame a CSV para descarga
+@st.cache_data
+def convert_df_to_csv(df):
+    return df.to_csv(index=False, encoding='utf-8-sig')
+
 
 def get_unidades_especificas_procedencia(df):
     """Obtiene lista de unidades específicas (excluye General)"""
     todas = df['Unidad'].unique().tolist()
     return [u for u in todas if u != UNIDAD_GENERAL_PROCEDENCIA]
+
+
+def analisis_pacientes_foraneos(df_procedencia):
+    """
+    Analiza los pacientes atendidos que no son del departamento de Escuintla.
+    """
+    df_general = df_procedencia[df_procedencia['Unidad'] == UNIDAD_GENERAL_PROCEDENCIA]
+    total_casos_general = df_general['Casos'].sum()
+
+    # Filtrar pacientes que NO son de Escuintla
+    df_foraneos = df_procedencia[df_procedencia['Departamento'] != 'ESCUINTLA'].copy()
+
+    if df_foraneos.empty:
+        return None
+
+    # Métricas principales
+    total_casos_foraneos = df_foraneos[df_foraneos['Unidad'] != UNIDAD_GENERAL_PROCEDENCIA]['Casos'].sum()
+    
+    # Asegurarnos de que el total foráneo no exceda el total general
+    df_foraneos_general = df_general[df_general['Departamento'] != 'ESCUINTLA']
+    total_casos_foraneos_oficial = df_foraneos_general['Casos'].sum()
+
+    pct_foraneos = (total_casos_foraneos_oficial / total_casos_general * 100) if total_casos_general > 0 else 0
+
+    # Distribución por unidad de atención
+    dist_unidad = df_foraneos[df_foraneos['Unidad'] != UNIDAD_GENERAL_PROCEDENCIA].groupby('Unidad')['Casos'].sum().reset_index()
+    dist_unidad = dist_unidad.sort_values('Casos', ascending=False)
+    
+    # Distribución por departamento de origen
+    dist_depto = df_foraneos_general.groupby('Departamento')['Casos'].sum().reset_index()
+    dist_depto = dist_depto.sort_values('Casos', ascending=False)
+
+    return {
+        'total_casos_foraneos': total_casos_foraneos_oficial,
+        'pct_foraneos': pct_foraneos,
+        'dist_unidad': dist_unidad,
+        'dist_depto': dist_depto
+    }
 
 
 def calcular_perfil_unidad(df, unidad):
@@ -183,6 +226,70 @@ def render(df_procedencia):
     if not unidades_especificas:
         st.error("No hay unidades específicas de atención disponibles.")
         return
+    
+    # =========================================================================
+    # ANÁLISIS DE PACIENTES FORÁNEOS
+    # =========================================================================
+    st.subheader("Análisis de Pacientes Foráneos (No Residentes en Escuintla)")
+
+    res_foraneos = analisis_pacientes_foraneos(df_procedencia)
+
+    if res_foraneos:
+        col_m1, col_m2 = st.columns(2)
+        with col_m1:
+            st.metric(
+                "Total Pacientes Foráneos",
+                format_large_number(int(res_foraneos['total_casos_foraneos']))
+            )
+        with col_m2:
+            st.metric(
+                "% sobre el Total General",
+                f"{res_foraneos['pct_foraneos']:.1f}%"
+            )
+
+        st.markdown("##### Unidades que más pacientes foráneos atienden")
+        col_t1, col_g1 = st.columns([1, 1])
+        with col_t1:
+            df_dist_unidad = res_foraneos['dist_unidad']
+            df_dist_unidad['Unidad'] = df_dist_unidad['Unidad'].str.replace(' Procedencia', '')
+            df_dist_unidad['Casos'] = df_dist_unidad['Casos'].apply(lambda x: format_large_number(int(x)))
+            st.dataframe(df_dist_unidad, use_container_width=True, hide_index=True)
+            
+            csv_foraneos = convert_df_to_csv(res_foraneos['dist_unidad'])
+            st.download_button(
+                label="📥 Descargar datos de Unidades (CSV)",
+                data=csv_foraneos,
+                file_name='unidades_pacientes_foraneos.csv',
+                mime='text/csv',
+                key='download_foraneos_unidades'
+            )
+            
+        with col_g1:
+            fig_foraneos = create_bar_chart(
+                res_foraneos['dist_unidad'].head(10).sort_values('Casos', ascending=True),
+                x='Casos',
+                y='Unidad',
+                title='Top 10 Unidades por Casos Foráneos',
+                orientation='h'
+            )
+            st.plotly_chart(fig_foraneos, use_container_width=True)
+
+        st.markdown("##### Departamentos de origen de pacientes foráneos")
+        st.dataframe(res_foraneos['dist_depto'], use_container_width=True, hide_index=True)
+        csv_deptos = convert_df_to_csv(res_foraneos['dist_depto'])
+        st.download_button(
+            label="📥 Descargar datos de Departamentos (CSV)",
+            data=csv_deptos,
+            file_name='origen_pacientes_foraneos.csv',
+            mime='text/csv',
+            key='download_foraneos_deptos'
+        )
+
+    else:
+        st.info("No se encontraron pacientes procedentes de fuera de Escuintla.")
+    
+    st.markdown("---")
+
 
     # =========================================================================
     # SELECTOR DE UNIDADES
@@ -381,3 +488,4 @@ def render(df_procedencia):
         - Detección de solapamiento o vacíos de cobertura
         - Evaluación del alcance territorial del IGSS en la región
         """)
+

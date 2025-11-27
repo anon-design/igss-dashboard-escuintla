@@ -24,32 +24,86 @@ def render_sidebar(df):
     st.sidebar.markdown("---")
 
     # --- 1. Menú de Navegación ---
-    menu_options = {
+    # Se refactoriza el menú para usar secciones y callbacks, mejorando la UI.
+
+    # Opciones del menú divididas en diccionarios para cada sección.
+    main_options = {
         "🏠 Inicio": "inicio",
         "👨 Morbilidad Adultos": "adultos",
         "👶 Morbilidad Pediátrica": "pediatrica",
-        "📚 Análisis por Capítulos CIE-10": "capitulos",
-        "⚠️ Enfermedades de Notificación Obligatoria": "eno",
+        "📚 Capítulos CIE-10": "capitulos",
+        "⚠️ Notificación Obligatoria": "eno",
         "💊 Enfermedades Crónicas": "cronicas",
         "🗺️ Análisis Geográfico": "geografico",
-        "─────────────────": "separator",  # Separador visual
+    }
+    
+    procedencia_options = {
         "🌍 Procedencia: General": "procedencia_general",
         "👨🌍 Procedencia: Adultos": "procedencia_adultos",
         "👶🌍 Procedencia: Pediátrica": "procedencia_pediatrica",
         "📚🌍 Procedencia: Capítulos": "procedencia_capitulos",
         "⚠️🌍 Procedencia: ENO": "procedencia_eno",
         "💊🌍 Procedencia: Crónicas": "procedencia_cronicas",
-        "───── Análisis Avanzado ─────": "separator2",
+    }
+
+    avanzado_options = {
         "🔀 Flujos Sankey": "procedencia_sankey",
         "📊 Análisis Cruzado": "procedencia_cruzado"
     }
 
-    selected_page = st.sidebar.radio(
-        "Selecciona un módulo:",
-        list(menu_options.keys()),
-        index=0
+    # Mapa completo para buscar el valor corto a partir de la etiqueta
+    page_mapping = {**main_options, **procedencia_options, **avanzado_options}
+
+    # Inicializar el estado de la sesión si no existe
+    if 'selected_page_key' not in st.session_state:
+        st.session_state.selected_page_key = "🏠 Inicio"
+
+    # Callback para actualizar la página seleccionada
+    def set_page():
+        # 'radio_selection' es la clave temporal que Streamlit usa internamente para el widget
+        st.session_state.selected_page_key = st.session_state.radio_selection
+
+    # --- Renderizado del menú por secciones ---
+    st.sidebar.markdown("##### Análisis General")
+    st.sidebar.radio(
+        "Módulos Principales",
+        options=main_options.keys(),
+        key="radio_selection",  # Clave única para el estado del widget
+        on_change=set_page,
+        label_visibility="collapsed",
+        # El índice se establece buscando la clave actual en las opciones de esta sección
+        index=list(main_options.keys()).index(st.session_state.selected_page_key)
+        if st.session_state.selected_page_key in main_options else None,
     )
+
     st.sidebar.markdown("---")
+    st.sidebar.markdown("##### Análisis de Procedencia")
+    st.sidebar.radio(
+        "Módulos de Procedencia",
+        options=procedencia_options.keys(),
+        key="radio_selection",
+        on_change=set_page,
+        label_visibility="collapsed",
+        index=list(procedencia_options.keys()).index(st.session_state.selected_page_key)
+        if st.session_state.selected_page_key in procedencia_options else None,
+    )
+
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("##### Análisis Avanzado")
+    st.sidebar.radio(
+        "Módulos Avanzados",
+        options=avanzado_options.keys(),
+        key="radio_selection",
+        on_change=set_page,
+        label_visibility="collapsed",
+        index=list(avanzado_options.keys()).index(st.session_state.selected_page_key)
+        if st.session_state.selected_page_key in avanzado_options else None,
+    )
+    
+    st.sidebar.markdown("---")
+
+    # El valor a retornar se obtiene del mapa usando la clave guardada en el estado
+    selected_page_value = page_mapping.get(st.session_state.selected_page_key, "inicio")
 
     # --- 2. Filtros Globales ---
     st.sidebar.subheader("🔍 Filtros Generales")

@@ -28,6 +28,11 @@ from utils.colors import (
     create_stacked_bar
 )
 
+# Helper para convertir DataFrame a CSV para descarga
+@st.cache_data
+def convert_df_to_csv(df):
+    return df.to_csv(index=False, encoding='utf-8-sig')
+
 
 def render(df_procedencia, df_eno, df_cronicas, df_diagnosticos,
            filtro_departamento=None, filtro_municipio=None):
@@ -130,7 +135,7 @@ def render(df_procedencia, df_eno, df_cronicas, df_diagnosticos,
 
     with col1:
         st.markdown(
-            create_metric_card_html("Total Casos Adultos", total_casos, color='primary'),
+            create_metric_card_html("Total Casos Adultos", format_large_number(total_casos), color='primary'),
             unsafe_allow_html=True
         )
 
@@ -157,17 +162,23 @@ def render(df_procedencia, df_eno, df_cronicas, df_diagnosticos,
     # =========================================================================
     # TOP N DIAGNÓSTICOS
     # =========================================================================
-    st.subheader("📊 Top N Diagnósticos Más Frecuentes")
+    show_all_dx = st.checkbox("Mostrar todos los diagnósticos (puede ser lento)", key="show_all_adultos_proc")
+    
+    subheader_dx = "📊 Diagnósticos Más Frecuentes" if show_all_dx else "📊 Top N Diagnósticos Más Frecuentes"
+    st.subheader(subheader_dx)
 
     top_n_value = 25
-    with st.expander("⚙️ Opciones de Visualización"):
-        top_n_value = st.number_input(
-            "Número de diagnósticos a mostrar:",
-            min_value=5, max_value=100, value=25, step=5,
-            key="top_n_adultos_proc"
-        )
+    if not show_all_dx:
+        with st.expander("⚙️ Opciones de Visualización"):
+            top_n_value = st.number_input(
+                "Número de diagnósticos a mostrar:",
+                min_value=5, max_value=100, value=25, step=5,
+                key="top_n_adultos_proc",
+                disabled=show_all_dx
+            )
 
-    top_n = get_top_n(df_adultos, n=top_n_value, group_by='CIE10')
+    n_param = None if show_all_dx else top_n_value
+    top_n = get_top_n(df_adultos, n=n_param, group_by='CIE10')
 
     if not top_n.empty:
         # Unir con catálogo de nombres
@@ -188,14 +199,13 @@ def render(df_procedencia, df_eno, df_cronicas, df_diagnosticos,
 
         # Tabla formateada
         top_display = top_n.copy()
-        top_display['Casos_fmt'] = top_display['Casos'].apply(format_large_number)
+        top_display['Casos'] = top_display['Casos'].apply(format_large_number)
 
         st.dataframe(
-            top_display[['Rank', 'Diagnóstico', 'CIE10', 'Casos_fmt', 'Porcentaje', 'Es_ENO', 'Es_Cronica']].rename(
+            top_display[['Rank', 'Diagnóstico', 'CIE10', 'Casos', 'Porcentaje', 'Es_ENO', 'Es_Cronica']].rename(
                 columns={
                     'Rank': '#',
                     'CIE10': 'Código',
-                    'Casos_fmt': 'Casos',
                     'Porcentaje': '%',
                     'Es_ENO': 'ENO',
                     'Es_Cronica': 'Crónica'
@@ -207,8 +217,21 @@ def render(df_procedencia, df_eno, df_cronicas, df_diagnosticos,
 
         st.info("💡 **Leyenda:** ⚠️ = ENO (Notificación Obligatoria) | 💊 = Enfermedad Crónica")
 
+        # Botón de descarga (siempre descarga la lista completa)
+        df_download = get_top_n(df_adultos, n=None, group_by='CIE10')
+        df_download = pd.merge(df_download, df_diagnosticos, left_on='CIE10', right_on='cie10', how='left')
+        df_download['Diagnóstico'] = df_download['nombre'].fillna('Nombre no disponible')
+        csv_data = convert_df_to_csv(df_download[['Rank', 'CIE10', 'Diagnóstico', 'Casos']])
+        
+        st.download_button(
+           label="📥 Descargar todos los diagnósticos (CSV)",
+           data=csv_data,
+           file_name="diagnosticos_adultos_procedencia.csv",
+           mime="text/csv",
+        )
+
         # Gráfico de barras
-        st.subheader(f"📈 Visualización Top {len(top_n)}")
+        st.subheader(f"📈 Visualización Top {top_n_value if not show_all_dx else 15}")
 
         top_grafico = top_n.head(15).sort_values('Casos', ascending=True)
         fig = create_bar_chart(

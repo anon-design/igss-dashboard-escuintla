@@ -32,6 +32,11 @@ from utils.colors import (
     format_large_number
 )
 
+# Helper para convertir DataFrame a CSV para descarga
+@st.cache_data
+def convert_df_to_csv(df):
+    return df.to_csv(index=False, encoding='utf-8-sig')
+
 
 def render(df_procedencia):
     """
@@ -118,18 +123,27 @@ def render(df_procedencia):
 
         with col_tabla:
             # Tabla de departamentos
+            st.write("Lista Completa de Departamentos")
             tabla_deptos = df_deptos.copy()
             tabla_deptos['Rank'] = range(1, len(tabla_deptos) + 1)
-            tabla_deptos['Casos_fmt'] = tabla_deptos['Casos'].apply(format_large_number)
-            tabla_deptos['Pct_fmt'] = tabla_deptos['Porcentaje'].apply(lambda x: f"{x:.2f}%")
+            tabla_deptos['Casos'] = tabla_deptos['Casos'].apply(format_large_number)
+            tabla_deptos['Porcentaje'] = tabla_deptos['Porcentaje'].apply(lambda x: f"{x:.2f}%")
 
             st.dataframe(
-                tabla_deptos[['Rank', 'Departamento', 'Casos_fmt', 'Pct_fmt']].rename(
-                    columns={'Rank': '#', 'Casos_fmt': 'Casos', 'Pct_fmt': '%'}
+                tabla_deptos[['Rank', 'Departamento', 'Casos', 'Porcentaje']].rename(
+                    columns={'Rank': '#', 'Porcentaje': '%'}
                 ),
                 use_container_width=True,
                 hide_index=True,
                 height=400
+            )
+            
+            csv_deptos = convert_df_to_csv(df_deptos)
+            st.download_button(
+                label="📥 Descargar datos de Departamentos (CSV)",
+                data=csv_deptos,
+                file_name='distribucion_departamentos.csv',
+                mime='text/csv',
             )
 
         with col_grafico:
@@ -149,9 +163,16 @@ def render(df_procedencia):
     # =========================================================================
 
     st.markdown("---")
-    st.subheader("🏘️ TOP 20 Municipios de Procedencia")
+    
+    show_all_mun = st.checkbox("Mostrar todos los municipios (puede ser lento)")
+    
+    subheader_mun = "🏘️ Distribución de Municipios de Procedencia" if show_all_mun else "🏘️ TOP 20 Municipios de Procedencia"
+    top_n_mun = None if show_all_mun else 20
+    height_mun = 800 if show_all_mun else 500
+    
+    st.subheader(subheader_mun)
 
-    df_municipios = get_distribucion_municipios(df_procedencia, top_n=20)
+    df_municipios = get_distribucion_municipios(df_procedencia, top_n=top_n_mun)
 
     if not df_municipios.empty:
         col_tabla2, col_grafico2 = st.columns([1, 1])
@@ -159,20 +180,30 @@ def render(df_procedencia):
         with col_tabla2:
             tabla_munis = df_municipios.copy()
             tabla_munis['Rank'] = range(1, len(tabla_munis) + 1)
-            tabla_munis['Casos_fmt'] = tabla_munis['Casos'].apply(format_large_number)
-            tabla_munis['Pct_fmt'] = tabla_munis['Porcentaje'].apply(lambda x: f"{x:.2f}%")
+            tabla_munis['Casos'] = tabla_munis['Casos'].apply(format_large_number)
+            tabla_munis['Porcentaje'] = tabla_munis['Porcentaje'].apply(lambda x: f"{x:.2f}%")
 
             st.dataframe(
-                tabla_munis[['Rank', 'Municipio', 'Departamento', 'Casos_fmt', 'Pct_fmt']].rename(
-                    columns={'Rank': '#', 'Casos_fmt': 'Casos', 'Pct_fmt': '%'}
+                tabla_munis[['Rank', 'Municipio', 'Departamento', 'Casos', 'Porcentaje']].rename(
+                    columns={'Rank': '#', 'Porcentaje': '%'}
                 ),
                 use_container_width=True,
                 hide_index=True,
-                height=500
+                height=height_mun
+            )
+
+            # Para la descarga, siempre obtener la lista completa
+            df_municipios_full = get_distribucion_municipios(df_procedencia, top_n=None)
+            csv_munis = convert_df_to_csv(df_municipios_full)
+            st.download_button(
+                label="📥 Descargar datos de Municipios (CSV)",
+                data=csv_munis,
+                file_name='distribucion_municipios.csv',
+                mime='text/csv',
             )
 
         with col_grafico2:
-            # Gráfico TOP 10 municipios
+            # Gráfico TOP 10 municipios (independiente de la selección de tabla)
             top_munis = df_municipios.head(10).sort_values('Casos', ascending=True)
             fig_munis = create_bar_chart(
                 top_munis,

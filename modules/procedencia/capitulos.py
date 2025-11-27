@@ -21,6 +21,11 @@ from utils.colors import (
     create_metric_card_html, format_large_number
 )
 
+# Helper para convertir DataFrame a CSV para descarga
+@st.cache_data
+def convert_df_to_csv(df):
+    return df.to_csv(index=False, encoding='utf-8-sig')
+
 
 def render(df_procedencia, df_capitulos, filtro_departamento=None, filtro_municipio=None):
     """
@@ -139,12 +144,20 @@ def render(df_procedencia, df_capitulos, filtro_departamento=None, filtro_munici
 
     with col_tabla:
         tabla_display = casos_capitulo.copy()
-        tabla_display['Casos_fmt'] = tabla_display['Casos'].apply(format_large_number)
+        tabla_display['Casos'] = tabla_display['Casos'].apply(format_large_number)
         st.dataframe(
-            tabla_display[['Rank', 'Capitulo', 'Casos_fmt', 'Porcentaje']].rename(
-                columns={'Rank': '#', 'Capitulo': 'Capítulo', 'Casos_fmt': 'Casos', 'Porcentaje': '%'}
+            tabla_display[['Rank', 'Capitulo', 'Casos', 'Porcentaje']].rename(
+                columns={'Rank': '#', 'Capitulo': 'Capítulo', 'Porcentaje': '%'}
             ),
             use_container_width=True, hide_index=True, height=500
+        )
+        
+        csv_data = convert_df_to_csv(casos_capitulo[['Rank', 'Capitulo', 'Casos', 'Porcentaje']])
+        st.download_button(
+           label="📥 Descargar datos de Capítulos (CSV)",
+           data=csv_data,
+           file_name="distribucion_capitulos_procedencia.csv",
+           mime="text/csv",
         )
 
     with col_grafico:
