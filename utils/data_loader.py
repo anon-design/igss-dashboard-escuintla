@@ -94,7 +94,6 @@ def load_data(uploaded_file=None):
 
         # 6. Ensamblar el DataFrame final y consistente
         df_final = pd.concat([df_partes, df_general_corregido], ignore_index=True)
-
         return df_final
 
     except FileNotFoundError:
@@ -505,7 +504,6 @@ def load_procedencia_data():
 
         # Limpiar código CIE10
         df['CIE10'] = df['CIE10'].astype(str).str.replace(r'[^A-Z0-9]', '', regex=True).str.upper()
-
         return df
 
     except FileNotFoundError:

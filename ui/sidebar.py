@@ -23,8 +23,7 @@ def render_sidebar(df):
     st.sidebar.title("📊 Dashboard Epidemiológico")
     st.sidebar.markdown("---")
 
-    # --- 1. Menú de Navegación ---
-    # Refactorización con keys únicas y gestión de estado para corregir error.
+    # --- 1. Navegación con 2 niveles (sección + módulo) ---
     main_options = {
         "🏠 Inicio": "inicio",
         "👨 Morbilidad Adultos": "adultos",
@@ -46,56 +45,52 @@ def render_sidebar(df):
         "🔀 Flujos Sankey": "procedencia_sankey",
         "📊 Análisis Cruzado": "procedencia_cruzado"
     }
-    page_mapping = {**main_options, **procedencia_options, **avanzado_options}
+
+    nav_sections = {
+        "📈 Análisis General": main_options,
+        "🧭 Procedencia": procedencia_options,
+        "🧪 Análisis Avanzado": avanzado_options,
+    }
 
     if 'selected_page_key' not in st.session_state:
-        st.session_state.selected_page_key = "🏠 Inicio"
+        st.session_state.selected_page_key = "inicio"
 
-    # Se captura la selección activa ANTES de renderizar los widgets
-    active_selection = st.session_state.selected_page_key
+    # Determinar la sección actual según la página seleccionada
+    def find_section(page_key):
+        for section_label, options in nav_sections.items():
+            if page_key in options.values():
+                return section_label
+        return "📈 Análisis General"
 
-    # --- Renderizado del menú por secciones con keys únicas ---
-    st.sidebar.markdown("##### Análisis General")
-    r1 = st.sidebar.radio(
-        "Módulos Principales", main_options.keys(), label_visibility="collapsed",
-        key="radio_main",
-        index=list(main_options.keys()).index(active_selection) if active_selection in main_options else None
+    current_section = find_section(st.session_state.selected_page_key)
+    section_labels = list(nav_sections.keys())
+    section_index = section_labels.index(current_section)
+
+    st.sidebar.caption("Navega por área y luego elige el módulo.")
+    section_choice = st.sidebar.radio(
+        "Áreas",
+        section_labels,
+        index=section_index,
+        key="nav_section"
     )
 
+    # Módulos de la sección elegida
+    section_options = nav_sections[section_choice]
+    module_labels = list(section_options.keys())
+    module_values = list(section_options.values())
+    module_index = module_values.index(st.session_state.selected_page_key) if st.session_state.selected_page_key in module_values else 0
+
     st.sidebar.markdown("---")
-    st.sidebar.markdown("##### Análisis de Procedencia")
-    r2 = st.sidebar.radio(
-        "Módulos de Procedencia", procedencia_options.keys(), label_visibility="collapsed",
-        key="radio_procedencia",
-        index=list(procedencia_options.keys()).index(active_selection) if active_selection in procedencia_options else None
+    module_choice_label = st.sidebar.radio(
+        "Módulos",
+        module_labels,
+        index=module_index,
+        key="nav_module"
     )
+    selected_page_value = section_options[module_choice_label]
+    st.session_state.selected_page_key = selected_page_value
 
     st.sidebar.markdown("---")
-    st.sidebar.markdown("##### Análisis Avanzado")
-    r3 = st.sidebar.radio(
-        "Módulos Avanzados", avanzado_options.keys(), label_visibility="collapsed",
-        key="radio_avanzado",
-        index=list(avanzado_options.keys()).index(active_selection) if active_selection in avanzado_options else None
-    )
-    
-    # --- Lógica para detectar el cambio y forzar el rerun ---
-    # Comprobar si la selección de algún radio ha cambiado respecto al estado guardado
-    new_selection = None
-    if r1 != active_selection and r1 in main_options:
-        new_selection = r1
-    elif r2 != active_selection and r2 in procedencia_options:
-        new_selection = r2
-    elif r3 != active_selection and r3 in avanzado_options:
-        new_selection = r3
-
-    # Si hay una nueva selección, actualizar el estado y re-ejecutar el script
-    if new_selection:
-        st.session_state.selected_page_key = new_selection
-        st.rerun()
-
-    st.sidebar.markdown("---")
-    
-    selected_page_value = page_mapping.get(st.session_state.selected_page_key, "inicio")
 
     # --- 2. Filtros Globales ---
     st.sidebar.subheader("🔍 Filtros Generales")

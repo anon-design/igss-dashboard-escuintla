@@ -144,7 +144,7 @@ def render(df_procedencia, df_cronicas, filtro_departamento=None, filtro_municip
             tabla_display[['Rank', 'Enfermedad', 'CIE10', 'Casos', 'Porcentaje']].rename(
                 columns={'Rank': '#', 'Porcentaje': '%'}
             ),
-            width='stretch', hide_index=True, height=400
+            use_container_width=True, hide_index=True, height=400
         )
         
         csv_data = convert_df_to_csv(casos_por_cronica[['Rank', 'CIE10', 'Enfermedad', 'Casos', 'Porcentaje']])
@@ -160,7 +160,7 @@ def render(df_procedencia, df_cronicas, filtro_departamento=None, filtro_municip
         fig = create_bar_chart(top_10, x='Casos', y='Enfermedad',
                                title='Top 10 Enfermedades Crónicas', orientation='h')
         fig.update_layout(height=400)
-        st.plotly_chart(fig, width='stretch')
+        st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("---")
 
@@ -180,7 +180,7 @@ def render(df_procedencia, df_cronicas, filtro_departamento=None, filtro_municip
     if not tendencia.empty:
         fig_lineas = create_line_chart(tendencia, x='Año', y='Casos',
                                        title=f'Evolución Temporal - Top {num_ecnt} ECNT', color='Enfermedad')
-        st.plotly_chart(fig_lineas, width='stretch')
+        st.plotly_chart(fig_lineas, use_container_width=True)
 
     st.markdown("---")
 
@@ -197,7 +197,7 @@ def render(df_procedencia, df_cronicas, filtro_departamento=None, filtro_municip
     with col_s1:
         fig_pie = create_pie_chart(dist_sexo, values='Casos', names='Sexo',
                                    title='Distribución por Sexo')
-        st.plotly_chart(fig_pie, width='stretch')
+        st.plotly_chart(fig_pie, use_container_width=True)
 
     with col_s2:
         for _, row in dist_sexo.iterrows():
@@ -223,14 +223,14 @@ def render(df_procedencia, df_cronicas, filtro_departamento=None, filtro_municip
                 dist_geo[['Departamento', 'Casos_fmt', 'Porcentaje']].rename(
                     columns={'Casos_fmt': 'Casos ECNT', 'Porcentaje': '%'}
                 ),
-                width='stretch', hide_index=True
+                use_container_width=True, hide_index=True
             )
 
         with col_g:
             top_deptos = dist_geo.head(10).sort_values('Casos', ascending=True)
             fig_geo = create_bar_chart(top_deptos, x='Casos', y='Departamento',
                                        title='Top 10 Departamentos con ECNT', orientation='h')
-            st.plotly_chart(fig_geo, width='stretch')
+            st.plotly_chart(fig_geo, use_container_width=True)
 
     # Info
     with st.expander("ℹ️ Información sobre ECNT"):

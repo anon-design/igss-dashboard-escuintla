@@ -211,7 +211,7 @@ def render(df_procedencia, df_eno, df_cronicas, df_diagnosticos,
                     'Es_Cronica': 'Crónica'
                 }
             ),
-            width='stretch',
+            use_container_width=True,
             hide_index=True
         )
 
@@ -242,7 +242,7 @@ def render(df_procedencia, df_eno, df_cronicas, df_diagnosticos,
             orientation='h'
         )
         fig.update_layout(height=max(400, len(top_grafico) * 35))
-        st.plotly_chart(fig, width='stretch')
+        st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("---")
 
@@ -272,7 +272,7 @@ def render(df_procedencia, df_eno, df_cronicas, df_diagnosticos,
                 title=f'Evolución Temporal - Top {num_top_temporal} Diagnósticos',
                 color='Diagnóstico'
             )
-            st.plotly_chart(fig_lineas, width='stretch')
+            st.plotly_chart(fig_lineas, use_container_width=True)
 
         # Distribución por sexo
         st.subheader(f"👥 Distribución por Sexo - Top {num_top_temporal}")
@@ -287,7 +287,7 @@ def render(df_procedencia, df_eno, df_cronicas, df_diagnosticos,
                 title='Distribución por Sexo',
                 color='Sexo'
             )
-            st.plotly_chart(fig_sexo, width='stretch')
+            st.plotly_chart(fig_sexo, use_container_width=True)
 
     st.markdown("---")
 
@@ -316,7 +316,7 @@ def render(df_procedencia, df_eno, df_cronicas, df_diagnosticos,
                 color='Diagnóstico'
             )
             fig_geo.update_layout(xaxis_tickangle=-45, height=500)
-            st.plotly_chart(fig_geo, width='stretch')
+            st.plotly_chart(fig_geo, use_container_width=True)
 
     # =========================================================================
     # INFORMACIÓN

@@ -149,7 +149,7 @@ def render(df_procedencia, df_capitulos, filtro_departamento=None, filtro_munici
             tabla_display[['Rank', 'Capitulo', 'Casos', 'Porcentaje']].rename(
                 columns={'Rank': '#', 'Capitulo': 'Capítulo', 'Porcentaje': '%'}
             ),
-            width='stretch', hide_index=True, height=500
+            use_container_width=True, hide_index=True, height=500
         )
         
         csv_data = convert_df_to_csv(casos_capitulo[['Rank', 'Capitulo', 'Casos', 'Porcentaje']])
@@ -164,7 +164,7 @@ def render(df_procedencia, df_capitulos, filtro_departamento=None, filtro_munici
         top_10_cap = casos_capitulo.head(10)
         fig_pie = create_pie_chart(top_10_cap, values='Casos', names='Capitulo',
                                    title='Top 10 Capítulos CIE-10')
-        st.plotly_chart(fig_pie, width='stretch')
+        st.plotly_chart(fig_pie, use_container_width=True)
 
     st.markdown("---")
 
@@ -183,7 +183,7 @@ def render(df_procedencia, df_capitulos, filtro_departamento=None, filtro_munici
     if not tendencia.empty:
         fig_lineas = create_line_chart(tendencia, x='Año', y='Casos',
                                        title=f'Evolución Temporal - Top {num_cap} Capítulos', color='Capitulo')
-        st.plotly_chart(fig_lineas, width='stretch')
+        st.plotly_chart(fig_lineas, use_container_width=True)
 
     st.markdown("---")
 
@@ -208,7 +208,7 @@ def render(df_procedencia, df_capitulos, filtro_departamento=None, filtro_munici
                 orientation='h'
             )
             fig_geo.update_layout(height=500)
-            st.plotly_chart(fig_geo, width='stretch')
+            st.plotly_chart(fig_geo, use_container_width=True)
 
     # Info
     with st.expander("ℹ️ Información sobre Capítulos CIE-10"):

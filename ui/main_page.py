@@ -49,7 +49,7 @@ def render_main_page(df_filtrado, df_completo, stats):
         marker=dict(size=10, color=COLORS['secondary'])
     )
     fig = apply_igss_theme(fig)
-    st.plotly_chart(fig, width='stretch')
+    st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("---")
 

@@ -133,7 +133,7 @@ def render(df_procedencia):
                 tabla_deptos[['Rank', 'Departamento', 'Casos', 'Porcentaje']].rename(
                     columns={'Rank': '#', 'Porcentaje': '%'}
                 ),
-                width='stretch',
+                use_container_width=True,
                 hide_index=True,
                 height=400
             )
@@ -156,7 +156,7 @@ def render(df_procedencia):
                 title='TOP 10 Departamentos de Procedencia',
                 orientation='h'
             )
-            st.plotly_chart(fig_deptos, width='stretch')
+            st.plotly_chart(fig_deptos, use_container_width=True)
 
     # =========================================================================
     # DISTRIBUCIÓN POR MUNICIPIO
@@ -187,7 +187,7 @@ def render(df_procedencia):
                 tabla_munis[['Rank', 'Municipio', 'Departamento', 'Casos', 'Porcentaje']].rename(
                     columns={'Rank': '#', 'Porcentaje': '%'}
                 ),
-                width='stretch',
+                use_container_width=True,
                 hide_index=True,
                 height=height_mun
             )
@@ -212,7 +212,7 @@ def render(df_procedencia):
                 title='TOP 10 Municipios de Procedencia',
                 orientation='h'
             )
-            st.plotly_chart(fig_munis, width='stretch')
+            st.plotly_chart(fig_munis, use_container_width=True)
 
     # =========================================================================
     # CONCENTRACIÓN GEOGRÁFICA
@@ -275,7 +275,7 @@ def render(df_procedencia):
             height=600,
             margin=dict(t=50, l=25, r=25, b=25)
         )
-        st.plotly_chart(fig_treemap, width='stretch')
+        st.plotly_chart(fig_treemap, use_container_width=True)
 
         st.caption("""
         **Cómo leer este gráfico:** El tamaño de cada rectángulo representa la cantidad de casos.
@@ -311,7 +311,7 @@ def render(df_procedencia):
                 tabla_unidades[['Unidad', 'Casos_fmt', 'Pct_fmt']].rename(
                     columns={'Casos_fmt': 'Casos', 'Pct_fmt': '% del Total'}
                 ),
-                width='stretch',
+                use_container_width=True,
                 hide_index=True
             )
 
@@ -323,7 +323,7 @@ def render(df_procedencia):
                 names='Unidad',
                 title='Distribución por Unidad de Atención'
             )
-            st.plotly_chart(fig_pie, width='stretch')
+            st.plotly_chart(fig_pie, use_container_width=True)
 
     # =========================================================================
     # INFORMACIÓN SOBRE LOS DATOS

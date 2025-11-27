@@ -52,6 +52,7 @@ def main():
     """
     Función principal que orquesta la aplicación Streamlit.
     """
+
     # --- 0. AUTENTICACIÓN ---
     # Verificar login antes de mostrar el dashboard
     if not check_password():
@@ -63,6 +64,7 @@ def main():
         st.session_state['datos'] = None
     if 'uploaded_file_hash' not in st.session_state:
         st.session_state['uploaded_file_hash'] = 'default'
+
 
     # Renderizar sidebar inicialmente para obtener uploaded_file
     # Pasamos un DataFrame vacío si aún no hay datos cargados para que el sidebar no falle.
@@ -183,4 +185,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
