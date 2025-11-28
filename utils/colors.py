@@ -164,7 +164,7 @@ def create_line_chart(df, x, y, title='', color=None, show_labels=None, text_str
                 textposition='top center'
             )
         else:
-            trace.update(line=dict(width=3), mode='lines+markers' if markers else 'lines')
+            trace.update(line=dict(width=3), mode='lines+markers' if markers else 'lines', text=None, texttemplate=None)
     if effective_labels:
         fig.update_layout(yaxis_tickformat=',', uniformtext_minsize=8, uniformtext_mode='hide')
 
