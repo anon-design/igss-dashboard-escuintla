@@ -145,7 +145,12 @@ def create_line_chart(df, x, y, title='', color=None, show_labels=None, text_str
             color_discrete_sequence=[COLORS['primary']],
         )
 
-    effective_labels = _labels_enabled() if show_labels is None else show_labels
+    global_labels = _labels_enabled()
+    if show_labels is None:
+        effective_labels = global_labels
+    else:
+        # Respeta toggle local pero nunca enciende si el global está apagado
+        effective_labels = bool(show_labels) and global_labels
 
     # Líneas con puntos y etiquetas visibles
     for trace in fig.data:

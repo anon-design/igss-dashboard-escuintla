@@ -216,7 +216,7 @@ def render(df, df_capitulos):
 
         toggle_labels = st.checkbox(
             "Mostrar etiquetas en esta gráfica",
-            value=True,
+            value=st.session_state.get("show_chart_labels", True),
             key="capitulos_temporal_labels"
         )
 
