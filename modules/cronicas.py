@@ -128,12 +128,18 @@ def render(df, df_cronicas):
         top_cronicas_filtrado['Porcentaje'] = (top_cronicas_filtrado['Casos'] / total_casos * 100).round(2)
 
         # Tabla formateada
-        tabla_display = top_cronicas_filtrado.copy()
-        tabla_display['Casos'] = tabla_display['Casos'].apply(format_large_number)
-        tabla_display = tabla_display[['Rank', 'CIE10', 'nombre', 'categoria', 'Casos', 'Porcentaje']]
-        tabla_display.columns = ['#', 'CIE-10', 'Enfermedad', 'Categoría', 'Casos', '%']
+        tabla_display = top_cronicas_filtrado[['Rank', 'CIE10', 'nombre', 'categoria', 'Casos', 'Porcentaje']].rename(
+            columns={'Rank': '#', 'CIE10': 'CIE-10', 'nombre': 'Enfermedad', 'categoria': 'Categoría', 'Porcentaje': '%'}
+        )
 
-        st.dataframe(tabla_display, use_container_width=True, hide_index=True)
+        st.dataframe(
+            tabla_display.style.format({
+                'Casos': '{:,.0f}',
+                '%': '{:.2f}%'
+            }),
+            use_container_width=True,
+            hide_index=True
+        )
 
         # Gráfico de barras
         st.subheader(f"📈 Visualización Top {len(top_cronicas_filtrado)}")
@@ -177,11 +183,14 @@ def render(df, df_cronicas):
     with col2:
         st.markdown("**Casos por Categoría:**")
         casos_por_categoria['Porcentaje'] = (casos_por_categoria['Casos'] / total_casos * 100).round(2)
-        casos_por_categoria['Casos_fmt'] = casos_por_categoria['Casos'].apply(format_large_number)
+        tabla_cat = casos_por_categoria[['categoria', 'Casos', 'Porcentaje']].rename(
+            columns={'categoria': 'Categoría', 'Porcentaje': '%'}
+        )
         st.dataframe(
-            casos_por_categoria[['categoria', 'Casos_fmt', 'Porcentaje']].rename(
-                columns={'categoria': 'Categoría', 'Casos_fmt': 'Casos', 'Porcentaje': '%'}
-            ),
+            tabla_cat.style.format({
+                'Casos': '{:,.0f}',
+                '%': '{:.2f}%'
+            }),
             use_container_width=True,
             hide_index=True
         )
