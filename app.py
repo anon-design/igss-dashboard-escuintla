@@ -112,30 +112,21 @@ def main():
     if filtros["selected_page"].startswith("procedencia"):
         df_procedencia_raw = load_procedencia_data()
 
-        # Aplicar filtros globales (año, sexo, edad) a los datos de procedencia
-        # VERSIÓN 1: Solo "General Escuintla Procedencia" (para módulos estándar)
+        todas_las_unidades = df_procedencia_raw['Unidad'].unique().tolist()
+
+        # Datos filtrados con todas las unidades para evitar perder subconjuntos
         df_procedencia = apply_filters_procedencia(
             df_procedencia_raw,
-            unidades=None,  # None = solo General (evita duplicación)
-            anios=filtros["filtro_año"],
-            departamentos=None,  # Filtros geográficos se manejan en cada módulo
-            municipios=None,
-            sexos=filtros["filtro_sexo"],
-            edades=filtros["filtro_edad"]
-        )
-
-        # VERSIÓN 2: TODAS las unidades (para Sankey y análisis cruzado)
-        # Estos módulos necesitan ver los flujos entre unidades específicas
-        todas_las_unidades = df_procedencia_raw['Unidad'].unique().tolist()
-        df_procedencia_todas_unidades = apply_filters_procedencia(
-            df_procedencia_raw,
-            unidades=todas_las_unidades,  # Incluir todas las unidades
+            unidades=todas_las_unidades,
             anios=filtros["filtro_año"],
             departamentos=None,
             municipios=None,
             sexos=filtros["filtro_sexo"],
             edades=filtros["filtro_edad"]
         )
+
+        # Alias explícito para módulos avanzados (reutiliza el mismo dataset completo)
+        df_procedencia_todas_unidades = df_procedencia
 
     # --- 4. Enrutador de Páginas ---
     # Un diccionario mapea la selección del usuario a la función de renderizado correspondiente.
