@@ -1,6 +1,7 @@
 """
 Módulo para renderizar la barra lateral (sidebar) de la aplicación.
 """
+from pathlib import Path
 import streamlit as st
 from utils.filters import get_unidades_especificas, get_total_general
 from utils.colors import format_large_number
@@ -15,10 +16,20 @@ def render_sidebar(df):
     Returns:
         dict: Un diccionario con todos los valores de los filtros seleccionados.
     """
-    st.sidebar.markdown(
-        "<h2 style='text-align: center; color: #0066A8;'>IGSS Escuintla Logo</h2>",
-        unsafe_allow_html=True
-    )
+    logo_candidates = [
+        Path("static/logo.png"),
+        Path("static/logo.jpg"),
+        Path("static/logo.jpeg")
+    ]
+    logo_path = next((p for p in logo_candidates if p.exists()), None)
+
+    if logo_path:
+        st.sidebar.image(str(logo_path), use_column_width=True)
+    else:
+        st.sidebar.markdown(
+            "<h2 style='text-align: center; color: #0066A8;'>IGSS Escuintla</h2>",
+            unsafe_allow_html=True
+        )
 
     st.sidebar.title("📊 Dashboard Epidemiológico")
     st.sidebar.markdown("---")
