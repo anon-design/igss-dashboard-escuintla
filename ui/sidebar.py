@@ -91,6 +91,13 @@ def render_sidebar(df):
     st.session_state.selected_page_key = selected_page_value
 
     st.sidebar.markdown("---")
+    
+    # Control global de etiquetas en gráficas
+    show_chart_labels = st.sidebar.checkbox(
+        "Mostrar etiquetas numéricas en gráficas",
+        value=st.session_state.get("show_chart_labels", True),
+        key="show_chart_labels"
+    )
 
     # --- 2. Filtros Globales ---
     st.sidebar.subheader("🔍 Filtros Generales")
@@ -178,7 +185,8 @@ def render_sidebar(df):
         "filtro_sexo": filtro_sexo,
         "filtro_edad": filtro_edad,
         "total_general": total_general,
-        "uploaded_file": uploaded_file
+        "uploaded_file": uploaded_file,
+        "show_chart_labels": show_chart_labels
     }
 
 def render_summary_stats(stats, total_general, filtro_unidad):
