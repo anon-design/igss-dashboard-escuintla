@@ -113,7 +113,7 @@ def create_bar_chart(df, x, y, title='', orientation='v', color=None):
     return apply_igss_theme(fig)
 
 
-def create_line_chart(df, x, y, title='', color=None):
+def create_line_chart(df, x, y, title='', color=None, show_labels=None, text_stride=1):
     """
     Crea un gráfico de líneas con estilo IGSS.
 
@@ -145,11 +145,17 @@ def create_line_chart(df, x, y, title='', color=None):
             color_discrete_sequence=[COLORS['primary']],
         )
 
+    effective_labels = _labels_enabled() if show_labels is None else show_labels
+
     # Líneas con puntos y etiquetas visibles
     for trace in fig.data:
-        vals = trace.y
-        if _labels_enabled():
-            text_vals = [_fmt_number(v) for v in vals]
+        vals = list(trace.y)
+        if effective_labels:
+            stride_calc = max(text_stride, max(1, len(vals) // 8))  # limita densidad
+            text_vals = [
+                _fmt_number(v) if (i % stride_calc == 0 or i == len(vals) - 1) else ""
+                for i, v in enumerate(vals)
+            ]
             trace.update(
                 line=dict(width=3),
                 mode='lines+markers+text',
@@ -159,7 +165,7 @@ def create_line_chart(df, x, y, title='', color=None):
             )
         else:
             trace.update(line=dict(width=3), mode='lines+markers')
-    if _labels_enabled():
+    if effective_labels:
         fig.update_layout(yaxis_tickformat=',', uniformtext_minsize=8, uniformtext_mode='hide')
 
     return apply_igss_theme(fig)

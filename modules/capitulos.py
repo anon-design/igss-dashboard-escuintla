@@ -214,12 +214,20 @@ def render(df, df_capitulos):
         # Agrupar por año y capítulo
         tendencia = df_top5.groupby(['Año', 'Capitulo'])['Casos'].sum().reset_index()
 
+        toggle_labels = st.checkbox(
+            "Mostrar etiquetas en esta gráfica",
+            value=True,
+            key="capitulos_temporal_labels"
+        )
+
         fig_lineas = create_line_chart(
             tendencia,
             x='Año',
             y='Casos',
             title='Evolución Temporal de los 5 Capítulos Más Frecuentes',
-            color='Capitulo'
+            color='Capitulo',
+            show_labels=toggle_labels,
+            text_stride=1
         )
 
         fig_lineas.update_layout(height=500)
