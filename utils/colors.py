@@ -113,7 +113,7 @@ def create_bar_chart(df, x, y, title='', orientation='v', color=None):
     return apply_igss_theme(fig)
 
 
-def create_line_chart(df, x, y, title='', color=None, show_labels=None, text_stride=1):
+def create_line_chart(df, x, y, title='', color=None, show_labels=None, text_stride=1, markers=True):
     """
     Crea un gráfico de líneas con estilo IGSS.
 
@@ -158,13 +158,13 @@ def create_line_chart(df, x, y, title='', color=None, show_labels=None, text_str
             ]
             trace.update(
                 line=dict(width=3),
-                mode='lines+markers+text',
+                mode='lines+markers+text' if markers else 'lines+text',
                 text=text_vals,
                 texttemplate='%{text}',
                 textposition='top center'
             )
         else:
-            trace.update(line=dict(width=3), mode='lines+markers')
+            trace.update(line=dict(width=3), mode='lines+markers' if markers else 'lines')
     if effective_labels:
         fig.update_layout(yaxis_tickformat=',', uniformtext_minsize=8, uniformtext_mode='hide')
 

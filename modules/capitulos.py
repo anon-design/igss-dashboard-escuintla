@@ -227,7 +227,8 @@ def render(df, df_capitulos):
             title='Evolución Temporal de los 5 Capítulos Más Frecuentes',
             color='Capitulo',
             show_labels=toggle_labels,
-            text_stride=1
+            text_stride=1,
+            markers=True
         )
 
         fig_lineas.update_layout(height=500)
