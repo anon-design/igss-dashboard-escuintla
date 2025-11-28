@@ -126,13 +126,15 @@ def render(df_procedencia):
             st.write("Lista Completa de Departamentos")
             tabla_deptos = df_deptos.copy()
             tabla_deptos['Rank'] = range(1, len(tabla_deptos) + 1)
-            tabla_deptos['Casos'] = tabla_deptos['Casos'].apply(format_large_number)
-            tabla_deptos['Porcentaje'] = tabla_deptos['Porcentaje'].apply(lambda x: f"{x:.2f}%")
+            tabla_deptos_display = tabla_deptos[['Rank', 'Departamento', 'Casos', 'Porcentaje']].rename(
+                columns={'Rank': '#', 'Porcentaje': '%'}
+            )
 
             st.dataframe(
-                tabla_deptos[['Rank', 'Departamento', 'Casos', 'Porcentaje']].rename(
-                    columns={'Rank': '#', 'Porcentaje': '%'}
-                ),
+                tabla_deptos_display.style.format({
+                    'Casos': '{:,.0f}',
+                    '%': '{:.2f}%'
+                }),
                 use_container_width=True,
                 hide_index=True,
                 height=400
@@ -180,13 +182,15 @@ def render(df_procedencia):
         with col_tabla2:
             tabla_munis = df_municipios.copy()
             tabla_munis['Rank'] = range(1, len(tabla_munis) + 1)
-            tabla_munis['Casos'] = tabla_munis['Casos'].apply(format_large_number)
-            tabla_munis['Porcentaje'] = tabla_munis['Porcentaje'].apply(lambda x: f"{x:.2f}%")
+            tabla_munis_display = tabla_munis[['Rank', 'Municipio', 'Departamento', 'Casos', 'Porcentaje']].rename(
+                columns={'Rank': '#', 'Porcentaje': '%'}
+            )
 
             st.dataframe(
-                tabla_munis[['Rank', 'Municipio', 'Departamento', 'Casos', 'Porcentaje']].rename(
-                    columns={'Rank': '#', 'Porcentaje': '%'}
-                ),
+                tabla_munis_display.style.format({
+                    'Casos': '{:,.0f}',
+                    '%': '{:.2f}%'
+                }),
                 use_container_width=True,
                 hide_index=True,
                 height=height_mun
@@ -304,13 +308,15 @@ def render(df_procedencia):
         with col_u1:
             # Tabla
             tabla_unidades = df_unidades.copy()
-            tabla_unidades['Casos_fmt'] = tabla_unidades['Casos'].apply(format_large_number)
-            tabla_unidades['Pct_fmt'] = tabla_unidades['Porcentaje'].apply(lambda x: f"{x:.2f}%")
+            tabla_unidades_display = tabla_unidades[['Unidad', 'Casos', 'Porcentaje']].rename(
+                columns={'Porcentaje': '% del Total'}
+            )
 
             st.dataframe(
-                tabla_unidades[['Unidad', 'Casos_fmt', 'Pct_fmt']].rename(
-                    columns={'Casos_fmt': 'Casos', 'Pct_fmt': '% del Total'}
-                ),
+                tabla_unidades_display.style.format({
+                    'Casos': '{:,.0f}',
+                    '% del Total': '{:.2f}%'
+                }),
                 use_container_width=True,
                 hide_index=True
             )
