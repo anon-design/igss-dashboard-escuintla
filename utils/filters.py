@@ -6,6 +6,57 @@ import pandas as pd
 import streamlit as st
 
 
+def _normalize_unidad_name(unidad):
+    """
+    Normaliza el nombre de una unidad para comparación/mapeo.
+
+    - trim
+    - lowercase
+    - colapsa espacios múltiples
+    """
+    if unidad is None:
+        return ""
+    return " ".join(str(unidad).strip().lower().split())
+
+
+def map_unidades_a_procedencia(unidades, unidades_procedencia_disponibles):
+    """
+    Mapea nombres de unidades (sin sufijo ' Procedencia') a unidades del dataset de procedencia.
+
+    Args:
+        unidades (list[str]): Unidades seleccionadas en el dataset principal (ej. "Hospital Escuintla")
+        unidades_procedencia_disponibles (list[str]): Valores disponibles en df_procedencia['Unidad']
+            (ej. "Hospital Escuintla Procedencia")
+
+    Returns:
+        tuple[list[str], list[str]]: (unidades_mapeadas, unidades_no_encontradas)
+    """
+    if not unidades:
+        return [], []
+
+    disponibles = unidades_procedencia_disponibles or []
+    mapa = {}
+    for u in disponibles:
+        base = str(u).replace(" Procedencia", "")
+        mapa[_normalize_unidad_name(base)] = str(u)
+
+    unidades_mapeadas = []
+    unidades_no_encontradas = []
+
+    for u in unidades:
+        key = _normalize_unidad_name(u)
+        if key in mapa:
+            unidades_mapeadas.append(mapa[key])
+        else:
+            unidades_no_encontradas.append(str(u))
+
+    # Deduplicar preservando orden (por seguridad)
+    unidades_mapeadas = list(dict.fromkeys(unidades_mapeadas))
+    unidades_no_encontradas = list(dict.fromkeys(unidades_no_encontradas))
+
+    return unidades_mapeadas, unidades_no_encontradas
+
+
 def apply_filters(df, unidades=None, años=None, sexos=None, edades=None):
     """
     Aplica filtros múltiples al DataFrame.
@@ -442,6 +493,26 @@ def validar_seleccion_unidades(unidades_seleccionadas):
 
 UNIDAD_GENERAL_PROCEDENCIA = 'General Escuintla Procedencia'
 
+
+def get_context_df_procedencia(df):
+    """
+    Retorna el DataFrame base para análisis de procedencia evitando duplicación.
+
+    - Si el DataFrame contiene 'General Escuintla Procedencia' junto con otras unidades,
+      se usa solo 'General' (100% de casos).
+    - Si no, se usa el DataFrame tal cual (p.ej. cuando viene filtrado a una unidad).
+    """
+    if df is None or df.empty:
+        return df
+    if 'Unidad' not in df.columns:
+        return df
+
+    unidades = df['Unidad'].dropna().unique().tolist()
+    if UNIDAD_GENERAL_PROCEDENCIA in unidades and len(unidades) > 1:
+        return df[df['Unidad'] == UNIDAD_GENERAL_PROCEDENCIA].copy()
+    return df.copy()
+
+
 def get_total_general_procedencia(df):
     """
     Obtiene el total de casos de 'General Escuintla Procedencia' (100% de casos).
@@ -455,8 +526,8 @@ def get_total_general_procedencia(df):
     if df is None or df.empty:
         return 0
 
-    df_general = df[df['Unidad'] == UNIDAD_GENERAL_PROCEDENCIA]
-    return int(df_general['Casos'].sum())
+    df_base = get_context_df_procedencia(df)
+    return int(df_base['Casos'].sum())
 
 
 def get_unidades_especificas_procedencia(df):
@@ -489,11 +560,17 @@ def calcular_casos_otros_procedencia(df):
     if df is None or df.empty:
         return 0
 
+    if 'Unidad' in df.columns:
+        unidades = df['Unidad'].dropna().unique().tolist()
+        # Si solo existe el total general, no es posible derivar "Otros" sin desglose por unidad.
+        if UNIDAD_GENERAL_PROCEDENCIA in unidades and len(unidades) == 1:
+            return 0
+
     total_general = get_total_general_procedencia(df)
     df_especificas = df[df['Unidad'] != UNIDAD_GENERAL_PROCEDENCIA]
     total_especificas = int(df_especificas['Casos'].sum())
 
-    return total_general - total_especificas
+    return max(total_general - total_especificas, 0)
 
 
 @st.cache_data
@@ -561,15 +638,14 @@ def get_distribucion_departamentos(df):
     if df is None or df.empty:
         return pd.DataFrame(columns=['Departamento', 'Casos', 'Porcentaje'])
 
-    # Solo usar General para evitar duplicación
-    df_general = df[df['Unidad'] == UNIDAD_GENERAL_PROCEDENCIA]
-    total_general = int(df_general['Casos'].sum())
+    df_base = get_context_df_procedencia(df)
+    total_general = int(df_base['Casos'].sum())
 
     if total_general == 0:
         return pd.DataFrame(columns=['Departamento', 'Casos', 'Porcentaje'])
 
     # Agrupar por departamento
-    df_dist = df_general.groupby('Departamento', as_index=False)['Casos'].sum()
+    df_dist = df_base.groupby('Departamento', as_index=False)['Casos'].sum()
     df_dist['Porcentaje'] = (df_dist['Casos'] / total_general * 100).round(2)
     df_dist = df_dist.sort_values('Casos', ascending=False)
 
@@ -591,15 +667,14 @@ def get_distribucion_municipios(df, top_n=20):
     if df is None or df.empty:
         return pd.DataFrame(columns=['Municipio', 'Departamento', 'Casos', 'Porcentaje'])
 
-    # Solo usar General para evitar duplicación
-    df_general = df[df['Unidad'] == UNIDAD_GENERAL_PROCEDENCIA]
-    total_general = int(df_general['Casos'].sum())
+    df_base = get_context_df_procedencia(df)
+    total_general = int(df_base['Casos'].sum())
 
     if total_general == 0:
         return pd.DataFrame(columns=['Municipio', 'Departamento', 'Casos', 'Porcentaje'])
 
     # Agrupar por municipio (incluir departamento para referencia)
-    df_dist = df_general.groupby(['Municipio', 'Departamento'], as_index=False)['Casos'].sum()
+    df_dist = df_base.groupby(['Municipio', 'Departamento'], as_index=False)['Casos'].sum()
     df_dist['Porcentaje'] = (df_dist['Casos'] / total_general * 100).round(2)
     df_dist = df_dist.sort_values('Casos', ascending=False)
     
@@ -625,6 +700,12 @@ def get_distribucion_unidades_procedencia(df):
     """
     if df is None or df.empty:
         return pd.DataFrame(columns=['Unidad', 'Casos', 'Porcentaje'])
+
+    if 'Unidad' in df.columns:
+        unidades_presentes = df['Unidad'].dropna().unique().tolist()
+        # Si solo está el total general, no hay desglose por unidad disponible.
+        if UNIDAD_GENERAL_PROCEDENCIA in unidades_presentes and len(unidades_presentes) == 1:
+            return pd.DataFrame(columns=['Unidad', 'Casos', 'Porcentaje'])
 
     total_general = get_total_general_procedencia(df)
 

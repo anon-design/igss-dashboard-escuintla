@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from config import COLORS
-from utils.filters import get_top_n, UNIDAD_GENERAL_PROCEDENCIA
+from utils.filters import get_context_df_procedencia
 from utils.colors import (
     create_bar_chart, create_line_chart, create_pie_chart,
     create_metric_card_html, format_large_number, create_stacked_bar
@@ -36,12 +36,8 @@ def render(df_procedencia, df_eno, filtro_departamento=None, filtro_municipio=No
         st.error("No hay datos de procedencia disponibles.")
         return
 
-    # Solo General Escuintla Procedencia
-    df_general = df_procedencia[df_procedencia['Unidad'] == UNIDAD_GENERAL_PROCEDENCIA].copy()
-
-    if df_general.empty:
-        st.error("No hay datos de 'General Escuintla Procedencia'.")
-        return
+    # Base de análisis (evita duplicación si vienen todas las unidades)
+    df_base = get_context_df_procedencia(df_procedencia)
 
     # =========================================================================
     # FILTROS GEOGRÁFICOS
@@ -52,7 +48,7 @@ def render(df_procedencia, df_eno, filtro_departamento=None, filtro_municipio=No
     col_f1, col_f2 = st.columns(2)
 
     with col_f1:
-        departamentos_disponibles = sorted(df_general['Departamento'].unique().tolist())
+        departamentos_disponibles = sorted(df_base['Departamento'].unique().tolist())
         filtro_depto = st.multiselect(
             "Departamento de procedencia:",
             options=departamentos_disponibles,
@@ -63,10 +59,10 @@ def render(df_procedencia, df_eno, filtro_departamento=None, filtro_municipio=No
     with col_f2:
         if filtro_depto:
             municipios_disponibles = sorted(
-                df_general[df_general['Departamento'].isin(filtro_depto)]['Municipio'].unique().tolist()
+                df_base[df_base['Departamento'].isin(filtro_depto)]['Municipio'].unique().tolist()
             )
         else:
-            municipios_disponibles = sorted(df_general['Municipio'].unique().tolist())
+            municipios_disponibles = sorted(df_base['Municipio'].unique().tolist())
 
         filtro_muni = st.multiselect(
             "Municipio de procedencia:",
@@ -76,7 +72,7 @@ def render(df_procedencia, df_eno, filtro_departamento=None, filtro_municipio=No
         )
 
     # Aplicar filtros
-    df_filtrado = df_general.copy()
+    df_filtrado = df_base.copy()
     if filtro_depto:
         df_filtrado = df_filtrado[df_filtrado['Departamento'].isin(filtro_depto)]
     if filtro_muni:

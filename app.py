@@ -5,11 +5,17 @@ Aplicación principal con navegación por módulos y una arquitectura modular.
 
 import streamlit as st
 import sys
+import pandas as pd
 from pathlib import Path
 
 from config import PAGE_CONFIG, CUSTOM_CSS
 from utils.data_loader import load_all_data, load_procedencia_data
-from utils.filters import apply_filters_jerarquicos, get_summary_stats, apply_filters_procedencia
+from utils.filters import (
+    apply_filters_jerarquicos,
+    get_summary_stats,
+    apply_filters_procedencia,
+    map_unidades_a_procedencia,
+)
 from utils.auth import check_password, render_logout_button
 
 # --- Importar Módulos de UI ---
@@ -112,21 +118,55 @@ def main():
     if filtros["selected_page"].startswith("procedencia"):
         df_procedencia_raw = load_procedencia_data()
 
-        todas_las_unidades = df_procedencia_raw['Unidad'].unique().tolist()
+        if df_procedencia_raw is None or df_procedencia_raw.empty:
+            df_procedencia = pd.DataFrame()
+            df_procedencia_todas_unidades = pd.DataFrame()
+        else:
+            todas_las_unidades = df_procedencia_raw['Unidad'].unique().tolist()
 
-        # Datos filtrados con todas las unidades para evitar perder subconjuntos
-        df_procedencia = apply_filters_procedencia(
-            df_procedencia_raw,
-            unidades=todas_las_unidades,
-            anios=filtros["filtro_año"],
-            departamentos=None,
-            municipios=None,
-            sexos=filtros["filtro_sexo"],
-            edades=filtros["filtro_edad"]
-        )
+            # Mapear filtro global de unidad (dataset principal) → unidades del dataset de procedencia
+            unidades_mapeadas, unidades_sin_procedencia = map_unidades_a_procedencia(
+                filtros["filtro_unidad"],
+                unidades_procedencia_disponibles=todas_las_unidades,
+            )
 
-        # Alias explícito para módulos avanzados (reutiliza el mismo dataset completo)
-        df_procedencia_todas_unidades = df_procedencia
+            if unidades_sin_procedencia:
+                st.sidebar.warning(
+                    "⚠️ Sin datos de procedencia para: "
+                    + ", ".join(unidades_sin_procedencia)
+                )
+
+            # Dataset para módulos estándar:
+            # - Sin selección → usa todas las unidades (incluye General + específicas)
+            #   para permitir vistas que comparan unidades (p.ej. "Procedencia: General").
+            # - Con selección → usa SOLO las unidades mapeadas disponibles
+            unidades_param = todas_las_unidades if not filtros["filtro_unidad"] else unidades_mapeadas
+
+            if unidades_param is not None and len(unidades_param) == 0:
+                # El usuario seleccionó unidades pero ninguna existe en el dataset de procedencia
+                df_procedencia = pd.DataFrame()
+            else:
+                df_procedencia = apply_filters_procedencia(
+                    df_procedencia_raw,
+                    unidades=unidades_param,
+                    anios=filtros["filtro_año"],
+                    departamentos=None,
+                    municipios=None,
+                    sexos=filtros["filtro_sexo"],
+                    edades=filtros["filtro_edad"],
+                )
+
+            # Dataset para módulos avanzados:
+            # usa todas las unidades (y filtros de año/sexo/edad) para habilitar Sankey/Cruzado
+            df_procedencia_todas_unidades = apply_filters_procedencia(
+                df_procedencia_raw,
+                unidades=todas_las_unidades,
+                anios=filtros["filtro_año"],
+                departamentos=None,
+                municipios=None,
+                sexos=filtros["filtro_sexo"],
+                edades=filtros["filtro_edad"],
+            )
 
     # --- 4. Enrutador de Páginas ---
     # Un diccionario mapea la selección del usuario a la función de renderizado correspondiente.
