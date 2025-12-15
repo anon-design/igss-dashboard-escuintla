@@ -136,25 +136,38 @@ def main():
                     + ", ".join(unidades_sin_procedencia)
                 )
 
+            # Si el usuario filtró por unidad pero ninguna existe en el dataset de procedencia,
+            # evitar que toda la sección quede en blanco: mostrar procedencia general con aviso.
+            if filtros["filtro_unidad"] and len(unidades_mapeadas) == 0:
+                unidades_disp = sorted(
+                    [u.replace(" Procedencia", "") for u in todas_las_unidades]
+                )
+                st.warning(
+                    "⚠️ No hay datos de procedencia para la(s) unidad(es) seleccionada(s). "
+                    "Procedencia solo está disponible para: "
+                    + ", ".join(unidades_disp)
+                    + ". Mostrando Procedencia General."
+                )
+
             # Dataset para módulos estándar:
             # - Sin selección → usa todas las unidades (incluye General + específicas)
             #   para permitir vistas que comparan unidades (p.ej. "Procedencia: General").
             # - Con selección → usa SOLO las unidades mapeadas disponibles
-            unidades_param = todas_las_unidades if not filtros["filtro_unidad"] else unidades_mapeadas
+            unidades_param = (
+                todas_las_unidades
+                if (not filtros["filtro_unidad"] or len(unidades_mapeadas) == 0)
+                else unidades_mapeadas
+            )
 
-            if unidades_param is not None and len(unidades_param) == 0:
-                # El usuario seleccionó unidades pero ninguna existe en el dataset de procedencia
-                df_procedencia = pd.DataFrame()
-            else:
-                df_procedencia = apply_filters_procedencia(
-                    df_procedencia_raw,
-                    unidades=unidades_param,
-                    anios=filtros["filtro_año"],
-                    departamentos=None,
-                    municipios=None,
-                    sexos=filtros["filtro_sexo"],
-                    edades=filtros["filtro_edad"],
-                )
+            df_procedencia = apply_filters_procedencia(
+                df_procedencia_raw,
+                unidades=unidades_param,
+                anios=filtros["filtro_año"],
+                departamentos=None,
+                municipios=None,
+                sexos=filtros["filtro_sexo"],
+                edades=filtros["filtro_edad"],
+            )
 
             # Dataset para módulos avanzados:
             # usa todas las unidades (y filtros de año/sexo/edad) para habilitar Sankey/Cruzado
