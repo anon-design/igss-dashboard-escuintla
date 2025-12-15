@@ -22,6 +22,7 @@ from utils.filters import (
     get_distribucion_municipios,
     get_distribucion_unidades_procedencia,
     calcular_casos_otros_procedencia,
+    get_context_df_procedencia,
     UNIDAD_GENERAL_PROCEDENCIA
 )
 from utils.colors import (
@@ -58,13 +59,18 @@ def render(df_procedencia):
     # MÉTRICAS PRINCIPALES
     # =========================================================================
 
-    # Obtener solo datos de General (el total real, sin duplicación)
-    df_general = df_procedencia[df_procedencia['Unidad'] == UNIDAD_GENERAL_PROCEDENCIA]
+    # Base de análisis (evita duplicación si vienen todas las unidades)
+    df_base = get_context_df_procedencia(df_procedencia)
+
+    unidades_contexto = sorted(df_procedencia['Unidad'].unique().tolist())
+    if UNIDAD_GENERAL_PROCEDENCIA not in unidades_contexto and len(unidades_contexto) > 0:
+        unidades_cortas = [u.replace(' Procedencia', '') for u in unidades_contexto]
+        st.info(f"🏥 Unidad(es) seleccionada(s): {', '.join(unidades_cortas)}")
 
     total_casos = get_total_general_procedencia(df_procedencia)
-    total_departamentos = df_general['Departamento'].nunique()
-    total_municipios = df_general['Municipio'].nunique()
-    total_codigos = df_general['CIE10'].nunique()
+    total_departamentos = df_base['Departamento'].nunique()
+    total_municipios = df_base['Municipio'].nunique()
+    total_codigos = df_base['CIE10'].nunique()
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -264,7 +270,7 @@ def render(df_procedencia):
         import plotly.express as px
 
         # Crear datos para treemap (Departamento > Municipio)
-        df_treemap = df_general.groupby(['Departamento', 'Municipio'])['Casos'].sum().reset_index()
+        df_treemap = df_base.groupby(['Departamento', 'Municipio'])['Casos'].sum().reset_index()
 
         # Treemap jerárquico
         fig_treemap = px.treemap(
